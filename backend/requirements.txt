@@ -1,0 +1,8 @@
+# IA (Groq via OpenAI compatível)
+openai>=2.0.0
+
+# variáveis de ambiente
+python-dotenv==1.0.1
+
+# FastAPI e dependências
+pip install "fastapi[standard]"

@@ -1,12 +1,17 @@
 import React, { useState, useRef } from "react";
 import T from "../styles/tokens";
+import api from "../api";
 import BasicTxtBox from "./TxtBoxBasica";
 import { UploadForm } from "./FormUpload";
 import { ActionButton } from "./BotaoAcao";
+import { LoadingScreen } from "./TelaCarregamento";
 
 export function EssayWritingBox({ onAICorrect, onHumanCorrect }) {
   /* Aba principal: "arquivo" | "digitar" */
   const [mainTab, setMainTab] = useState("digitar");
+
+  /* Estado de carregamento */
+  const [isLoading, setIsLoading] = useState(false)
  
   /* Conteúdo da textarea */
   const [essayText, setEssayText] = useState("");
@@ -47,7 +52,40 @@ export function EssayWritingBox({ onAICorrect, onHumanCorrect }) {
     setPreviewUrl(null);
     setUploadedFileName(null);
   }
- 
+
+  async function handleEssayUpload() {
+    if (mainTab === "arquivo") {
+
+      if (!uploadedFile) {
+        alert("Por favor, selecione uma imagem");
+        return;
+      }
+
+      const formData = new FormData()
+      formData.append("file", uploadedFile)
+
+      setIsLoading(true)
+
+      try{
+        const response = await api.post("ocr/extrair_texto/", formData);
+
+        if(response.status === 200 && response.data) {
+          
+          if (response.data.texto_extraido){
+            setMainTab("digitar")
+            setEssayText(response.data.texto_extraido);
+          }
+          
+        }
+      }catch (error){
+        console.error("Erro: ", error)
+      }finally{
+        setIsLoading(false)
+      }
+      
+    }
+  }
+
   return (
     <div style={{
         flex: 1,
@@ -56,6 +94,8 @@ export function EssayWritingBox({ onAICorrect, onHumanCorrect }) {
         height: "100%",
         minHeight: 0,
     }}>
+
+      {isLoading && <LoadingScreen message="Extraindo texto da imagem enviada..."/>}
       <div style={{
         display: "flex",
         gap: 12,
@@ -113,6 +153,7 @@ export function EssayWritingBox({ onAICorrect, onHumanCorrect }) {
             uploadedFileName={uploadedFileName}
             handleFileChange={handleFileChange}
             handleRemoveFile={handleRemoveFile}
+            handleEssayUpload={handleEssayUpload}
           />
         )}
       </div>

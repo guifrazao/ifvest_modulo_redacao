@@ -12,7 +12,7 @@ export default function BasicTxtBox({ placeholder, essayText, setEssayText }){
             minHeight: 160,
             border: `1px solid ${T.bordaTab}`,
             padding: "10px 12px", fontSize: 13,
-            fontFamily: "Roboto, sans-serif", color: "#757575",
+            fontFamily: "Roboto, sans-serif", color: "#000",
             resize: "vertical", outline: "none",
             background: "#fff", display: "block",
           }}

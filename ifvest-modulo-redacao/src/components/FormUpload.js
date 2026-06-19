@@ -1,4 +1,5 @@
 import T from "../styles/tokens"
+import { ActionButton } from "./BotaoAcao"
 
 export function UploadForm({
     fileInputRef,
@@ -7,6 +8,7 @@ export function UploadForm({
     uploadedFileName,
     handleFileChange,
     handleRemoveFile,
+    handleEssayUpload,
 }){
     return (
         <div>
@@ -60,9 +62,13 @@ export function UploadForm({
                     }}>
                         {uploadedFileName}
                     </p>
-                    <button onClick={handleRemoveFile} className="btn-remover-upload">
+                    <div style={{ display: "flex", justifyContent: "center", gap: 8, }}>
+                        <ActionButton onClick={handleEssayUpload} text="Confirmar" color="var(--btn-upload)" textColor="#fff" borderRadius={8} />
+                        <ActionButton onClick={handleRemoveFile} text="Remover" color="#fff" textColor="var(--btn-upload)" borderRadius={8} />
+                    </div>
+                    {/* <button onClick={handleRemoveFile} className="btn-remover-upload">
                         Remover
-                    </button>
+                    </button> */}
                 </div>
             )}
 
@@ -87,9 +93,13 @@ export function UploadForm({
                     }}>
                         {uploadedFileName}
                     </p>
-                    <button onClick={handleRemoveFile} className="btn-remover-upload">
+                    <div style={{ display: "flex", justifyContent: "center", gap: 8, }}>
+                        <ActionButton onClick={handleEssayUpload} text="Confirmar" color="var(--btn-upload)" textColor="#fff" borderRadius={8} />
+                        <ActionButton onClick={handleRemoveFile} text="Remover" color="#fff" textColor="var(--btn-upload)" borderRadius={8} />
+                    </div>
+                    {/* <button onClick={handleRemoveFile} className="btn-remover-upload">
                         Remover
-                    </button>
+                    </button> */}
                 </div>
             )}
         </div>

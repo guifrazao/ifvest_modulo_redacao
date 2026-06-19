@@ -1,0 +1,1 @@
+from .teste_ocr import GroqAIResponse
