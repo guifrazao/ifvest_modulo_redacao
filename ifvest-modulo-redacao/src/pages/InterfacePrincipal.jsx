@@ -79,15 +79,6 @@ export default function InterfacePrincipal() {
           {/* Barra de pesquisa */}
           <TopicSearchBar placeholder={"Pesquisar temas de redação..."} onChange={e => setQuery(e.target.value)}/>
  
-          {/* Tema de semana */}
-          <div style={{ padding: "0 0 8px" }}>
-            <EssayTopicCard
-              title="TEMA DA SEMANA: Tratamento a imigrantes no Brasil e no Mundo"
-              featured
-              onClick={() => {}}
-            />
-          </div>
- 
           {/* Lista temas */}
           <div className="row" style={{ margin: "0 -8px" }}>
                 {filtered.map(topic => (

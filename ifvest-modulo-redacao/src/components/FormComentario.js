@@ -9,134 +9,79 @@ export function AnnotationForm({
   comentario, 
   onComentarioChange,
   isNovoComentario,
-  onCriarComentario
+  onCriarComentario,
+  isEditing,
+  onStartEdit,
+  onSaveEdit,
+  style
 }) {
-  // Encontra o objeto da competência atual para saber a cor do Badge (Garante um fallback seguro)
   const competenciaAtual = competenciasDisponiveis.find(c => c.label === competenciaSelecionada) || competenciasDisponiveis[0];
 
   return (
-    <div style={{
-      border: "2px solid #2d6a4f",
-      borderRadius: 12,
-      background: "#ffffff",
-      padding: 16,
-      width: "100%",
-      maxWidth: 360,
-      boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
-      fontFamily: "'Roboto', sans-serif"
-    }}>
-      {/* Cabeçalho */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 16,
-        gap: 8
-      }}>
-        {isNovoComentario ? (
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            background: "#f0f0f0",
-            padding: "0 10px",
-            borderRadius: 20,
-            border: "1px solid #ccc"
-          }}>
-            {/* Ícone competência atual */}
-            <span style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              background: competenciaAtual ? competenciaAtual.cor : "#ccc",
-              flexShrink: 0
-            }} />
-            
-            {/* Dropdown competências */}
-            <select
-              value={competenciaSelecionada}
-              onChange={(e) => onCompetenciaChange(e.target.value)}
-              style={{
-                padding: "6px 0",
-                borderRadius: 20,
-                border: "none",
-                fontSize: 13,
-                fontWeight: 500,
-                outline: "none",
-                background: "transparent",
-                cursor: "pointer"
-              }}
-            >
-              {competenciasDisponiveis.map(c => (
-                <option key={c.id} value={c.label}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+    <div className="comment-popover-card" style={style}>
+      {/* ── MOTO DE VISUALIZAÇÃO/LEITURA ── */}
+      {!isNovoComentario && !isEditing ? (
+        <div>
+          <div className="popover-header">
+            <div className="badge-competencia-view">
+              <span className="badge-dot" style={{ background: competenciaAtual ? competenciaAtual.cor : "#ccc" }} />
+              <span className="badge-text">{competenciaSelecionada}</span>
+            </div>
           </div>
-        ) : (
-          /* Ícone estático (para comentários já criados) */
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            background: "#e0e0e0",
-            padding: "6px 14px",
-            borderRadius: 20
-          }}>
-            <span style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              background: competenciaAtual ? competenciaAtual.cor : "#ccc"
-            }} />
-            <span style={{ fontSize: 13, fontWeight: 500, color: "#333" }}>
-              {competenciaSelecionada}
-            </span>
+          
+          <p className="comment-view-text">
+            {comentario || <em>Nenhum comentário inserido.</em>}
+          </p>
+
+          <div className="popover-actions-wrapper">
+            <ActionButton onClick={onStartEdit} text="Editar" color="#f0f0f0" textColor="#2d6a4f" borderRadius={20} />
+            <ActionButton onClick={onDelete} text="Excluir" color="#fbebeb" textColor="#dc3545" borderRadius={20} />
           </div>
-        )}
+        </div>
+      ) : (
 
-        {/* Botão Cancelar/Excluir */}
-        <ActionButton
-          onClick={onDelete}
-          text={isNovoComentario ? "Cancelar" : "Minimizar"}
-          color={isNovoComentario ? "#e53935" : "#f0f0f0"}
-          textColor={isNovoComentario ? "#ffffff" : "#757575"}
-          borderRadius={20}
-        />
-      </div>
+        <div>
+          <div className="popover-header">
+            <div className="select-competencia-container">
+              <span className="badge-dot" style={{ background: competenciaAtual ? competenciaAtual.cor : "#ccc" }} />
+              <select
+                value={competenciaSelecionada}
+                onChange={(e) => onCompetenciaChange(e.target.value)}
+                className="select-competencia-dropdown"
+              >
+                {competenciasDisponiveis.map(c => (
+                  <option key={c.id} value={c.label}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Campo de texto do comentário */}
-      <textarea
-        value={comentario}
-        onChange={(e) => onComentarioChange(e.target.value)}
-        placeholder="Digite o comentário sobre a competência..."
-        style={{
-          width: "100%",
-          height: 180,
-          border: "1px solid #7a7a7a",
-          borderRadius: 12,
-          padding: 12,
-          fontSize: 13,
-          fontFamily: "'Roboto', sans-serif",
-          color: "#555",
-          outline: "none",
-          resize: "none",
-          boxSizing: "border-box",
-          marginBottom: isNovoComentario ? 12 : 0
-        }}
-      />
+            <ActionButton
+              onClick={onDelete}
+              text={isNovoComentario ? "Cancelar" : "Descartar"}
+              color="#e53935"
+              textColor="#ffffff"
+              borderRadius={20}
+            />
+          </div>
 
-      {/* Botão criar comentário */}
-      {isNovoComentario && (
-        <ActionButton
-            onClick={onCriarComentario}
-            text="Criar comentário"
+          <textarea
+            value={comentario}
+            onChange={(e) => onComentarioChange(e.target.value)}
+            placeholder="Digite o comentário sobre a competência..."
+            className="popover-textarea"
+          />
+
+          <ActionButton
+            onClick={isNovoComentario ? onCriarComentario : onSaveEdit}
+            text={isNovoComentario ? "Criar comentário" : "Salvar alterações"}
             color="#2d6a4f"
             textColor="#ffffff"
             borderRadius={20}
             width="100%"
-        />
+          />
+        </div>
       )}
     </div>
   );

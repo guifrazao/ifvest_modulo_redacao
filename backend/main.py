@@ -1,9 +1,20 @@
+
 from fastapi import FastAPI, UploadFile, File
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from core.config import settings
-from schemas import GroqAIResponse
-from routers import teste_ocr
-from ocr_groq_vlm import GroqVLMOCR
+from contextlib import asynccontextmanager
+from core import settings
+from database import create_db_and_tables
+from models import SupportText, Proposta
+from routers import teste_ocr, proposta, support_text
+
+#Necessário para realizar tarefas no start up/encerramento da execução
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    #Tudo antes do yield é executado no start up
+    yield
+    #Tudo depois do yield é executado no encerramento
 
 app = FastAPI(
     title="API IFVest - Domínio redações",
@@ -11,6 +22,7 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 app.add_middleware(
@@ -21,8 +33,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="./static/uploads"), name="static")
+
 app.include_router(teste_ocr.router, prefix=settings.API_PREFIX)
+app.include_router(proposta.router, prefix=settings.API_PREFIX)
+app.include_router(support_text.router, prefix=settings.API_PREFIX)
 app.router.redirect_slashes=False
+
 
 if __name__ == "__main__":
     import uvicorn

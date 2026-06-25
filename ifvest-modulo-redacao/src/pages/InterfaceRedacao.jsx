@@ -41,12 +41,25 @@ export default function InterfaceRedacao(){
             <SubHeader title="Redação" onBack={() => navigate(-1)} />
 
             {/* Corpo */}
-            <main style={{ flex: 1, padding: "14px 12px", display: "flex", flexDirection: "column", width: "100%", maxWidth: 700, alignSelf: "center" }}>
-                <SupportTextsContainer items={componentList}>
-                  
-                </SupportTextsContainer>
+            <main style={{ flex: 1, 
+              padding: "14px 12px", 
+              display: "flex", 
+              flexDirection: 
+              "row", 
+              gap: 16,
+              width: "100%", 
+              maxWidth: 1200, 
+              alignSelf: "center" }}>
+                <div style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  minWidth: 0,
+                }}>
+                  <SupportTextsContainer items={componentList}/>
+                </div>
 
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0}}>
                   <EssayWritingBox
                     onAICorrect={() => {}}
                     onHumanCorrect={() => {}}
@@ -68,7 +81,7 @@ export default function InterfaceRedacao(){
                         onClick={() => alert("Sua redação foi enviada para correção")}
                         text="Correção com corretor"
                         color="var(--btn-correcao-prof)"
-                        textColor="#ffffff"
+                        textColor="#000"
                         borderRadius={8}
                         width={"100%"}
                       />

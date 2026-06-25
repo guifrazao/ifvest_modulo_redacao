@@ -39,6 +39,5 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Outputs
-output/
-correcoes/
+# Database
+*.db

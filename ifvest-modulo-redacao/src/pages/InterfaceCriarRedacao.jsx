@@ -1,4 +1,5 @@
 import T from "../styles/tokens"
+import api from "../api";
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
@@ -12,7 +13,7 @@ import { ActionButton } from "../components/BotaoAcao";
 import { SupportTextItem } from "../components/TextoApoio";
 import { SuppTextCreationArea } from "../components/FormCriacaoTxtApoio";
 
-
+/* TODO: ADICIONAR BOTÕES EDITAR/REMOVER E MOVER AS TAGS PRA FORA DA CRIAÇÃO DE TEXTO DE APOIO */
 export default function InterfaceCriarRedacao(){
     const [page,  setPage]  = useState(1);
     const [isCreating, setIsCreating] = useState(false);
@@ -28,6 +29,27 @@ export default function InterfaceCriarRedacao(){
         body:  data.bodyText,
         type:  data.type === "figura" ? "image" : "text",
         }]);
+    }
+
+    async function createSupportText(data) { /* Apenas texto por enquanto */
+        try{
+            const formData = new FormData();
+            formData.append("title", data.title);
+            formData.append("type", data.type === "figura" ? "image" : "text");
+            formData.append("source", data.source)
+
+            if (data.type === "texto"){
+                formData.append("content", data.bodyText);
+            }else{
+                formData.append("file", data.file);
+            }
+
+            const response = await api.post("/support_text/create_text/", formData)
+            addComponent(data);
+
+        }catch (error){
+            alert("Erro ao criar texto de apoio: ", error)
+        }
     }
 
     return (
@@ -51,8 +73,9 @@ export default function InterfaceCriarRedacao(){
                         {isCreating ? (
                             <SuppTextCreationArea
                                 onCancel={() => setIsCreating(false)}
-                                onInsert={(data) => {
-                                    addComponent(data)
+                                onInsert={async (data) => {
+                                    await createSupportText(data)
+                                    // addComponent(data)
                                     setIsCreating(false)                                 
                                 }}
                             />

@@ -3,6 +3,8 @@ from pydantic_settings import BaseSettings
 from pydantic import field_validator
 
 class Settings(BaseSettings):
+    DATABASE_URL: str
+    
     API_PREFIX: str = "/api"
 
     ALLOWED_ORIGINS: str = ""

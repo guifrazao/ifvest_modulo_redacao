@@ -120,14 +120,6 @@ export default function InterfaceProf() {
             </button>
           </div>
  
-          {/* Tema da semana */}
-          <div style={{ padding: "0 0 8px" }}>
-            <EssayTopicCard
-              title="TEMA DA SEMANA: Tratamento a imigrantes no Brasil e no Mundo"
-              featured
-              onClick={() => {}}
-            />
-          </div>
  
           {/* Lista de temas */}
           <div className="row" style={{ margin: "0 -8px" }}>
