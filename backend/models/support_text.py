@@ -3,8 +3,8 @@ from pydantic import model_validator
 from datetime import datetime
 from sqlmodel import Field, SQLModel, Relationship
 
-if TYPE_CHECKING:
-    from .proposta import Proposta
+#if TYPE_CHECKING:
+from .proposta import Proposta
 
 class SupportTextBase(SQLModel):
     title: str = Field()
@@ -16,8 +16,9 @@ class SupportTextBase(SQLModel):
     def validate_fields_by_type(self):
         if self.type == "text" and not self.content:
             raise ValueError("O campo 'content' é obrigatório quando 'type' é 'text")
-        if self.type == "image" and not self.content:
+        if self.type == "image" and not self.image_url:
             raise ValueError("O campo 'image_url' é obrigatório quando 'type' é 'image")
+        return self
 
 class SupportText(SupportTextBase, table=True):
     __tablename__: str = "support_texts"
@@ -25,7 +26,7 @@ class SupportText(SupportTextBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     source: str = Field(index=True)
     id_proposta: Optional[int] = Field(default=None, foreign_key="propostas.id_proposta") #Relação N (SupportText) : 1 (Proposta)
-    proposta: Optional["Proposta"] = Relationship(back_populates="support_texts")
+    proposta: Proposta = Relationship(back_populates="support_texts")
 
 class SupportTextPublic(SupportTextBase):
     id: int

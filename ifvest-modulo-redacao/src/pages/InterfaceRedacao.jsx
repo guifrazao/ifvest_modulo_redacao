@@ -1,30 +1,54 @@
 import "../styles/App.css"
+import api from "../api.js"
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
 import { Footer } from "../components/Footer";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { PaginationBar } from "../components/Paginacao";
 import { EssayWritingBox } from "../components/AreaRedacao";
 import BasicTxtBox from "../components/TxtBoxBasica";
 import { ActionButton } from "../components/BotaoAcao";
 import { SupportTextItem } from "../components/TextoApoio";
-
-//Dados temporários
-const textosApoio = [
-  {type: "text", label: "TEXTO I", title: "O QUE É EDUCAÇÃO PROFISSIONAL", body: "Educação Profissional é o modelo de aprendizagem com foco no desenvolvimento de competências e habilidades técnicas para suprir a demanda do mercado de trabalho. São oferecidos cursos para trabalhadores jovens e adultos, independente de escolaridade, com o objetivo de qualificação e requalificação profissional. Para alunos jovens e adultos que estejam cursando ou tenham concluído o ensino são oferecidos cursos técnicos profissionalizantes"},
-  {type: "text", label: "TEXTO II", title: "O QUE É EDUCAÇÃO PROFISSIONAL", body: "Educação Profissional é o modelo de aprendizagem com foco no desenvolvimento de competências e habilidades técnicas para suprir a demanda do mercado de trabalho. São oferecidos cursos para trabalhadores jovens e adultos, independente de escolaridade, com o objetivo de qualificação e requalificação profissional. Para alunos jovens e adultos que estejam cursando ou tenham concluído o ensino são oferecidos cursos técnicos profissionalizantes"},
-  {type: "image", label: "TEXTO III", title: "O QUE É EDUCAÇÃO PROFISSIONAL",}
-]
+import { LoadingScreen } from "../components/TelaCarregamento.js";
 
 export default function InterfaceRedacao(){
 
 
     const [page,  setPage]  = useState(1);
-    const [componentList, setComponentList] = useState(textosApoio);
+    const [componentList, setComponentList] = useState([]);
+    const [essayTitle, setEssayTitle] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
+    const { id } = useParams();
+
+    useEffect(() => {
+      async function getProposta() {
+        try{
+          const response = await api.get(`/proposta/${id}/`);
+          const proposta = response.data;
+
+          setEssayTitle(proposta.title);
+
+          const textos = proposta.support_texts.map((st, index) => ({
+                    type:  st.type,
+                    label: `TEXTO ${index + 1}`,
+                    title: st.title,
+                    body:  st.content,
+                }));
+          setComponentList(textos);
+          setIsLoading(false);
+        }catch (error){
+          console.error("Erro ao carregar redação: ", error)
+        }
+      }
+
+      getProposta();
+    }, [id])
+
+    if (isLoading) return <LoadingScreen message="Carregando proposta de redação..."/>
 
     return (
 
@@ -38,7 +62,7 @@ export default function InterfaceRedacao(){
         }}>
             <Header onProfileClick={() => {}} />
 
-            <SubHeader title="Redação" onBack={() => navigate(-1)} />
+            <SubHeader title={essayTitle} onBack={() => navigate(-1)} />
 
             {/* Corpo */}
             <main style={{ flex: 1, 

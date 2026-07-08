@@ -11,12 +11,6 @@ export function SuppTextCreationArea({ onCancel, onInsert }) {
   const [bodyText, setBodyText] = useState("");
   const [source, setSource] = useState("");
   
-  // Estados para o controle de tags e menu dropdown
-  const [tags, setTags] = useState(["Educação"]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [availableOptions, setAvailableOptions] = useState(["Educação", "Economia", "Saúde"]);
-  const [inputValue, setInputValue] = useState("");
-
   // Estados do componente de upload
   const [uploadedFile, setUploadedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -48,38 +42,7 @@ export function SuppTextCreationArea({ onCancel, onInsert }) {
     setPreviewUrl(null);
     setUploadedFileName(null);
   }
-
-  // Handlers de Tags
-  const handleAddTag = (option) => {
-    if (!tags.includes(option)) {
-      setTags([...tags, option]);
-    }
-    setShowDropdown(false);
-  };
-
-  const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-
-  const handleCreateTag = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      const newTag = inputValue.trim();
-
-      if (newTag === "") return
-
-      if (!availableOptions.includes(newTag)) {
-        setAvailableOptions([...availableOptions, newTag]);
-      }
-
-      if (!tags.includes(newTag)) {
-        setTags([...tags, newTag]);
-      }
-
-      setInputValue("");
-      setShowDropdown(false);
-    }
-  };
+  
   return (
     <div 
     className="form-criacao-txt-apoio"
@@ -166,77 +129,6 @@ export function SuppTextCreationArea({ onCancel, onInsert }) {
         />
       </div>
 
-      {/* Lista tags */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative", flexWrap: "wrap" }}>
-        <span style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>Tags:</span>
-        
-        {/* Renderização das tags adicionadas */}
-        {tags.map((tag, index) => (
-          <div key={index} className="lista-tags" style={{display: "flex", alignItems: "center", gap: 6,}}>
-            <span>{tag}</span>
-            <span 
-              onClick={() => handleRemoveTag(tag)} 
-              style={{ cursor: "pointer", fontWeight: "bold" }}
-            >
-              X
-            </span>
-          </div>
-        ))}
-
-        {/* Textbox para adicionar nova tag (abre o dropdown quando clicada) */}
-        <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
-          <div className="textbox-tags" style={{
-            display: "flex",
-            alignItems: "center",            
-            boxSizing: "border-box"
-          }}>
-            <input 
-              type="text" 
-              placeholder="..."
-              value={inputValue}
-              onClick={() => setShowDropdown(!showDropdown)}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleCreateTag}
-              style={{ width: 50, border: "none", outline: "none", fontSize: 13, cursor: "pointer" }} 
-            />
-            <span 
-              onClick={() => {
-                setInputValue("")
-                setShowDropdown(!showDropdown)
-              }} 
-              style={{ cursor: "pointer", fontWeight: "bold", fontSize: 13 }}
-            >
-              X
-            </span>
-          </div>
-          
-          {/* Dropdown tags */}
-          {showDropdown && (
-            <div className="dropdown-tags">
-              {availableOptions.map((option, idx) => (
-                <div 
-                  key={idx} 
-                  onClick={() => handleAddTag(option)}
-                  className="tag"
-                  style={{ borderBottom: idx !== availableOptions.length - 1 ? "1px solid #eee" : "none",}}
-                >
-                  {option}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Botão adicionar */}
-        <div 
-          onClick={() => setShowDropdown(!showDropdown)}
-          className="btn-adicionar-tag"
-          style={{display: "flex", alignItems: "center",}}
-        >
-          +
-        </div>
-      </div>
-
       {/* Botões criar e cancelar */}
       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
         <ActionButton 
@@ -251,7 +143,6 @@ export function SuppTextCreationArea({ onCancel, onInsert }) {
                 type, 
                 bodyText: type === "texto" ? bodyText : null, 
                 source, 
-                tags,
                 file: type === "figura" ? uploadedFile : null,
                 previewUrl: type === "figura" ? previewUrl : null
               });

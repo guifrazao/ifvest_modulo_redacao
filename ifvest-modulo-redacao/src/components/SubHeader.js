@@ -1,5 +1,5 @@
 import "../styles/App.css"
-export function SubHeader({ title, onBack, navigate }) {
+export function SubHeader({ title, onTitleChange, onBack, readOnly = true, navigate }) {
   return (
     <div 
       className="subheader"
@@ -29,9 +29,14 @@ export function SubHeader({ title, onBack, navigate }) {
       </button>
  
       {/* Título centrado */}
-      <span className="titulo-subheader">
-        {title}
-      </span>
+      <input
+        type="text"
+        value={title}
+        readOnly={readOnly}
+        className={readOnly ? "titulo-subheader-readonly" : "titulo-subheader"}
+        onChange={onTitleChange}
+        placeholder="Digite o título da proposta aqui..."
+      />
     </div>
   );
 }

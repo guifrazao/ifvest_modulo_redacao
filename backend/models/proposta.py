@@ -3,11 +3,11 @@ from datetime import datetime
 from sqlmodel import Field, SQLModel, Relationship, JSON
 
 if TYPE_CHECKING:
-    from .support_text import SupportText
+    from .support_text import SupportText, SupportTextPublic
 
 class PropostaBase(SQLModel): #Será usada na criação das correções (área do aluno/corretor)
     title: str = Field(index=True)
-    created_at: datetime
+    created_at: datetime = Field(default=datetime)
 
 class Proposta(PropostaBase, table=True):   
     __tablename__: str = "propostas"
@@ -17,10 +17,14 @@ class Proposta(PropostaBase, table=True):
     tags: List[str] = Field(default=None, sa_type=JSON)
 
 class PropostaPublic(PropostaBase): #Garante que o id nunca será None quando for solicitado (Consumidores da API não precisam verificar se o id é None)
-    id: int
+    id_proposta: int
+
+class PropostaDetail(PropostaPublic):
+    support_texts: List["SupportTextPublic"]
+    tags: List[str]
 
 class PropostaCreate(PropostaBase):
-    support_texts: List["SupportText"]
+    support_text_ids: List[int]
     tags: List[str]
 
 class PropostaUpdate(PropostaBase):
@@ -31,8 +35,9 @@ class PropostaUpdate(PropostaBase):
 
 #Necessário para que a documentação automática funcione
 try:
-    from .support_text import SupportText
+    from .support_text import SupportText, SupportTextPublic
     Proposta.model_rebuild()
+    PropostaDetail.model_rebuild()
     PropostaCreate.model_rebuild()
     PropostaUpdate.model_rebuild()
 except Exception as e:

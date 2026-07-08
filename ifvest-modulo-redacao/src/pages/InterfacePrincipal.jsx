@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useNavigate, useNavigation } from 'react-router-dom';
 import "../styles/App.css"
+import api from "../api.js"
 import { Header } from '../components/Header.js';
 import { SubHeader } from '../components/SubHeader.js';
 import { TopicSearchBar } from '../components/BarraPesquisa.js';
@@ -9,34 +10,50 @@ import { EssayTopicCard } from '../components/CardRedacao.js';
 import { PaginationBar } from '../components/Paginacao.js';
 import { Footer } from '../components/Footer.js';
 import { ActionButton } from '../components/BotaoAcao.js';
+import { LoadingScreen } from '../components/TelaCarregamento.js';
 
-const TOPICS = [
-  { id: 1, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 2, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-  { id: 3, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 4, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-  { id: 5, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 6, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-  { id: 7, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 8, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-  { id: 9, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 10, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-  { id: 11, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 12, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-  { id: 13, title: "O uso de câmeras policiais no Brasil: limites e possibilidades",  done: false },
-  { id: 14, title: "Perspectiva acerca do envelhecimento na sociedade brasileira",     done: true  },
-];
+/* TODO: Sinalização do status de progresso da redação/correção (não feita/aguardando correção/feita) */
 
 export default function InterfacePrincipal() {
   const [page,  setPage]  = useState(1);
   const [query, setQuery] = useState("");
 
+  const [topics, setTopics] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
   const navigate = useNavigate();
  
-  const filtered = TOPICS.filter(t =>
-    t.title.toLowerCase().includes(query.toLowerCase())
+  useEffect(() => {
+    async function getEssays() {
+      try{
+        const response = await api.get("/proposta/");
+      
+        const propostas = response.data.map(proposta => ({
+          id_proposta: proposta.id_proposta,
+          title: proposta.title,
+          done: false
+        }));
+    
+        console.log(propostas)
+        setTopics(propostas)
+        setIsLoading(false);
+      }catch (error){
+        console.error("Erro ao carregar propostas: ", error)
+      }
+    }
+
+    getEssays();
+
+
+  }, []);
+
+  const filtered = topics.filter(t =>
+    t.title ? t.title.toLowerCase().includes(query.toLowerCase()) : false
   );
  
+  if (isLoading) return <LoadingScreen message="Carregando propostas de redação..."/>
+
   return (
     <>
  
@@ -83,14 +100,14 @@ export default function InterfacePrincipal() {
           <div className="row" style={{ margin: "0 -8px" }}>
                 {filtered.map(topic => (
                     <div
-                    key={topic.id}
-                    className={topic.fullWitdh ? "col-12" : "col-s-6 col-6"}
+                    key={topic.id_proposta}
+                    className={"col-s-6 col-6"}
                     style={{ padding: "8px" }}
                     >
                     <EssayTopicCard
                         title={topic.title}
                         done={topic.done}
-                        onClick={() => navigate("/redacao")}
+                        onClick={() => navigate(`redacao/${topic.id_proposta}`)}
                     />
                     </div>
                 ))}
