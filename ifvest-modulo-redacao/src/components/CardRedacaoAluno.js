@@ -1,6 +1,6 @@
 import T from "../styles/tokens.js";
 
-export function EssayTopicCard({ 
+export function CorrectionTopicCard({ 
   title, 
   done = false, 
   onClick, 

@@ -153,7 +153,7 @@ export default function InterfaceProf() {
                     <EssayTopicCard
                         title={topic.title}
                         done={topic.done}
-                        onClick={() => navigate(`/redacao/${topic.id_proposta}`)}
+                        onClick={() => navigate(`/proposta/${topic.id_proposta}`)}
                     />
                     </div>
                 ))}

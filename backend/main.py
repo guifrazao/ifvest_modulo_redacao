@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from core import settings
 from database import create_db_and_tables
-from models import SupportText, Proposta
-from routers import teste_ocr, proposta, support_text
+from models import SupportText, Proposta, User
+from routers import teste_ocr, proposta, support_text, user, essay
 
 #Necessário para realizar tarefas no start up/encerramento da execução
 @asynccontextmanager
@@ -38,9 +38,10 @@ app.mount("/static", StaticFiles(directory="./static/uploads"), name="static")
 app.include_router(teste_ocr.router, prefix=settings.API_PREFIX)
 app.include_router(proposta.router, prefix=settings.API_PREFIX)
 app.include_router(support_text.router, prefix=settings.API_PREFIX)
+app.include_router(essay.router, prefix=settings.API_PREFIX)
+app.include_router(user.router, prefix=settings.API_PREFIX)
 app.router.redirect_slashes=False
 
-
-if __name__ == "__main__":
+if __name__ == "__main__": 
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

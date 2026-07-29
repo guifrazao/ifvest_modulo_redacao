@@ -1,0 +1,62 @@
+from fastapi import APIRouter, Depends, Form, HTTPException
+from typing import List
+from sqlmodel import Session, select
+from datetime import datetime
+from database import get_session
+from models import Essay, EssayPublic, EssayCreate, Proposta, User
+from schemas import EssayWithProposta
+
+router = APIRouter(
+    prefix = "/redacao",
+    tags = ["redacao"]
+)
+
+@router.post("/create/", response_model=EssayPublic)
+def create_essay(
+    *,
+    session: Session = Depends(get_session),
+    essay: EssayCreate,
+):
+    proposta = session.get(Proposta, essay.proposta_id)
+    if not proposta:
+        raise HTTPException(status_code=404, detail="Proposta não encontrada")
+    
+    user = session.get(User, essay.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    db_essay = Essay(
+        submitted_text=essay.submitted_text,
+        image_url=essay.image_url,
+        submitted_at=essay.submitted_at,
+        user_id=essay.user_id,
+        proposta_id=essay.proposta_id,
+    )
+    
+    session.add(db_essay)
+    session.commit()
+    session.refresh(db_essay)
+
+    return db_essay
+
+@router.get("/usuario/{user_id}/", response_model=List[EssayWithProposta])
+def get_essays_by_user(
+    *,
+    session: Session = Depends(get_session),
+    user_id: int
+):
+    statement = select(Essay).where(Essay.user_id == user_id)
+    essays = session.exec(statement).all()
+
+    result = []
+    for essay in essays:
+        result.append(EssayWithProposta(
+            id=essay.id,
+            submitted_text=essay.submitted_text,
+            image_url=essay.image_url,
+            submitted_at=essay.submitted_at,
+            status=essay.status,
+            title=essay.proposta.title,
+        ))
+
+    return result

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, HTTPException
 from typing import List
 from sqlmodel import Session, select
 from datetime import datetime
@@ -47,5 +47,5 @@ def get_proposta(
 ):
     db_proposta = session.get(Proposta, id_proposta)
     if not db_proposta:
-        raise Exception("Proposta não encontrada")
+        raise HTTPException(status_code=404, detail="Proposta não encontrada")
     return db_proposta

@@ -6,15 +6,12 @@ import { UploadForm } from "./FormUpload";
 import { ActionButton } from "./BotaoAcao";
 import { LoadingScreen } from "./TelaCarregamento";
 
-export function EssayWritingBox({ onAICorrect, onHumanCorrect }) {
+export function EssayWritingBox({ essayText, setEssayText }) {
   /* Aba principal: "arquivo" | "digitar" */
   const [mainTab, setMainTab] = useState("digitar");
 
   /* Estado de carregamento */
   const [isLoading, setIsLoading] = useState(false)
- 
-  /* Conteúdo da textarea */
-  const [essayText, setEssayText] = useState("");
  
   /* Arquivo selecionado e URL de preview */
   const [uploadedFile, setUploadedFile]       = useState(null);

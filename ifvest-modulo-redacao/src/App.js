@@ -17,9 +17,9 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<Navigate to={rotaPrincipal} replace />}/>
-          <Route path="/aluno" element={<InterfacePrincipal/>}/>
+          <Route path="/student" element={<InterfacePrincipal/>}/>
           <Route path="/professor" element={<InterfaceProf/>}/>
-          <Route path="/redacao/:id" element={<InterfaceRedacao/>}/>
+          <Route path="/proposta/:id" element={<InterfaceRedacao/>}/>
           <Route path="/criar_redacao" element={<InterfaceCriarRedacao/>}/>
           <Route path="/correcao" element={<InterfaceCorrecao/>}/>
           <Route path="/area_aluno" element={<InterfaceAreaAluno/>}/>

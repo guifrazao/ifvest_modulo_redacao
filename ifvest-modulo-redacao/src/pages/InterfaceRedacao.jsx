@@ -1,5 +1,6 @@
 import "../styles/App.css"
 import api from "../api.js"
+import "../globals.js"
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
@@ -12,6 +13,7 @@ import BasicTxtBox from "../components/TxtBoxBasica";
 import { ActionButton } from "../components/BotaoAcao";
 import { SupportTextItem } from "../components/TextoApoio";
 import { LoadingScreen } from "../components/TelaCarregamento.js";
+import { idUsuario } from "../globals.js"
 
 export default function InterfaceRedacao(){
 
@@ -19,10 +21,35 @@ export default function InterfaceRedacao(){
     const [page,  setPage]  = useState(1);
     const [componentList, setComponentList] = useState([]);
     const [essayTitle, setEssayTitle] = useState("");
+    const [essayText, setEssayText] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
     const { id } = useParams();
+
+    async function handleSubmitEssay(type) {
+        if (!essayText.trim()) {
+            alert("Escreva ou envie sua redação antes de enviar para correção");
+            return;
+        }
+
+        try {
+            const response = await api.post("/redacao/create/", {
+                submitted_text: essayText,
+                image_url: null,
+                submitted_at: new Date().toISOString(),
+                user_id: idUsuario,
+                proposta_id: Number(id),
+            });
+
+            console.log("Redação criada:", response.data);
+            alert("Sua redação foi enviada para correção");
+            navigate("/area_aluno/")
+        } catch (error) {
+            console.error("Erro ao criar redação:", error);
+            alert("Não foi possível enviar a redação");
+        }
+    }
 
     useEffect(() => {
       async function getProposta() {
@@ -84,15 +111,13 @@ export default function InterfaceRedacao(){
                 </div>
 
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0}}>
-                  <EssayWritingBox
-                    onAICorrect={() => {}}
-                    onHumanCorrect={() => {}}
-                  />
+                  <EssayWritingBox essayText={essayText} setEssayText={setEssayText}/>
+
                   {/* Botões de correção */}
                   <div style={{ display: "flex", gap: 8, marginTop: 10, width: "100%", }}>
                     <div style={{flex: 1}}>
                       <ActionButton 
-                        onClick={() => alert("Sua redação foi enviada para correção")}
+                        onClick={() => handleSubmitEssay("ai")}
                         text="Correção com IA"
                         color="var(--btn-correcao-ia)"
                         textColor="#ffffff"
@@ -102,7 +127,7 @@ export default function InterfaceRedacao(){
                     </div>
                     <div style={{flex: 1}}>
                       <ActionButton 
-                        onClick={() => alert("Sua redação foi enviada para correção")}
+                        onClick={() => handleSubmitEssay("human")}
                         text="Correção com corretor"
                         color="var(--btn-correcao-prof)"
                         textColor="#000"

@@ -5,7 +5,7 @@ import { Header } from "../components/Header.js";
 import { SubHeader } from "../components/SubHeader.js";
 import { PaginationBar } from "../components/Paginacao.js";
 import { Footer } from "../components/Footer.js";
-import { EssayTopicCard } from "../components/CardRedacaoAluno.js";
+import { CorrectionTopicCard } from "../components/CardRedacaoAluno.js";
 
 export default function InterfaceAreaCorretor() {
   const handleCardClick = (id) => {
@@ -55,13 +55,13 @@ export default function InterfaceAreaCorretor() {
             gap: "20px",
             flexWrap: "wrap"
           }}>
-            <EssayTopicCard 
+            <CorrectionTopicCard 
               title="Perspectiva acerca do envelhecimento na sociedade brasileira"
               done={false}
               submissionDate="13/05/2026"
               onClick={() => handleCardClick(1)}
             />
-            <EssayTopicCard 
+            <CorrectionTopicCard 
               title="Perspectiva acerca do envelhecimento na sociedade brasileira"
               done={false}
               submissionDate="13/05/2026"
@@ -88,7 +88,7 @@ export default function InterfaceAreaCorretor() {
             gap: "20px",
             flexWrap: "wrap"
           }}>
-            <EssayTopicCard 
+            <CorrectionTopicCard 
               title="Perspectiva acerca do envelhecimento na sociedade brasileira"
               done={true}
               correctionDate="13/05/2026"
@@ -96,7 +96,7 @@ export default function InterfaceAreaCorretor() {
               correctorName="EXEMPLO DA SILVA"
               onClick={() => handleCardClick(3)}
             />
-            <EssayTopicCard 
+            <CorrectionTopicCard 
               title="Perspectiva acerca do envelhecimento na sociedade brasileira"
               done={true}
               correctionDate="13/05/2026"
