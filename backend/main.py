@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from core import settings
 from database import create_db_and_tables
 from models import SupportText, Proposta, User
-from routers import teste_ocr, proposta, support_text, user, essay
+from routers import teste_ocr, proposta, support_text, user, essay, comment, correction
 
 #Necessário para realizar tarefas no start up/encerramento da execução
 @asynccontextmanager
@@ -40,6 +40,8 @@ app.include_router(proposta.router, prefix=settings.API_PREFIX)
 app.include_router(support_text.router, prefix=settings.API_PREFIX)
 app.include_router(essay.router, prefix=settings.API_PREFIX)
 app.include_router(user.router, prefix=settings.API_PREFIX)
+app.include_router(comment.router, prefix=settings.API_PREFIX)
+app.include_router(correction.router, prefix=settings.API_PREFIX)
 app.router.redirect_slashes=False
 
 if __name__ == "__main__": 

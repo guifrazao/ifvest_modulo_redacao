@@ -1,11 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../api.js";
 import T from "../styles/tokens";
 import { Header } from "../components/Header";
 import { SubHeader } from "../components/SubHeader";
 import { Footer } from "../components/Footer";
 import { AnnotationForm } from "../components/FormComentario";
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
+import { LoadingScreen } from "../components/TelaCarregamento";
 
 const competenciasDisponiveis = [
   { id: "c1", label: "Competência 1", cor: "#fbc02d" },
@@ -19,48 +21,261 @@ const dadosCompetenciasEnem = [
   { id: "c1", nome: "Competência 1", desc: "Demonstrar domínio da modalidade escrita formal da língua portuguesa." },
   { id: "c2", nome: "Competência 2", desc: "Compreender a proposta de redação e aplicar conceitos das várias áreas de conhecimento para desenvolver o tema." },
   { id: "c3", nome: "Competência 3", desc: "Selecionar, relacionar, organizar e interpretar informações, fatos, opiniões e argumentos em defesa de um ponto de vista." },
-  { id: "c4", nome: "Competência 4", desc: "Demonstrar conhecimento dos mechanisms linguísticos necessários para a construção da argumentação." },
+  { id: "c4", nome: "Competência 4", desc: "Demonstrar conhecimento dos mecanismos linguísticos necessários para a construção da argumentação." },
   { id: "c5", nome: "Competência 5", desc: "Elaborar proposta de intervenção para o problema abordado, que respeite os direitos humanos." }
 ];
 
-export default function InterfaceCorrecao() {
-  const [notasCompetencias, setNotasCompetencias] = useState({
-    c1: 0,
-    c2: 0,
-    c3: 0,
-    c4: 0,
-    c5: 0
-  });
+/* Componente memoizado para impedir que a seleção do DOM seja limpa em re-renderizações do pai */
+const TextoRedacao = React.memo(
+  React.forwardRef(function TextoRedacao({ html, onClick, onMouseOver, onMouseOut, readOnly }, ref) {
+    return (
+      <div
+        ref={ref}
+        onClick={onClick}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        className={`container-redacao-correcao ${readOnly ? "container-redacao-readonly" : ""}`}
+        style={readOnly ? { cursor: "default" } : undefined}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  })
+);
 
+function escapeHtml(str) {
+  return str
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function construirHtmlComMarcacoes(texto, comentarios) {
+  if (!texto) return "";
+  if (!comentarios || comentarios.length === 0) return escapeHtml(texto).replaceAll("\n", "<br/>");
+
+  const ordenados = [...comentarios]
+    .filter(c => typeof c.startOffset === "number" && typeof c.endOffset === "number")
+    .sort((a, b) => a.startOffset - b.startOffset);
+
+  let cursor = 0;
+  let html = "";
+
+  for (const c of ordenados) {
+    if (c.startOffset < cursor) continue;
+
+    html += escapeHtml(texto.slice(cursor, c.startOffset));
+    const trecho = texto.slice(c.startOffset, c.endOffset);
+    html += `<mark data-id="${c.id}" style="background-color:${c.cor};color:inherit;cursor:pointer;">${escapeHtml(trecho)}</mark>`;
+    cursor = c.endOffset;
+  }
+
+  html += escapeHtml(texto.slice(cursor));
+  return html.replaceAll("\n", "<br/>");
+}
+
+function getCharOffsetInContainer(container, targetNode, targetOffset) {
+  let offset = 0;
+  let found = false;
+
+  function traverse(node) {
+    if (found) return;
+
+    if (node === targetNode) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        offset += Math.min(targetOffset, node.nodeValue.length);
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        for (let i = 0; i < targetOffset && i < node.childNodes.length; i++) {
+          traverse(node.childNodes[i]);
+        }
+      }
+      found = true;
+      return;
+    }
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      offset += node.nodeValue.length;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.tagName === "BR") {
+        offset += 1;
+      } else {
+        for (let child of node.childNodes) {
+          traverse(child);
+          if (found) break;
+        }
+      }
+    }
+  }
+
+  traverse(container);
+  return offset;
+}
+
+function getContainerTextLength(container) {
+  let length = 0;
+  function traverse(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      length += node.nodeValue.length;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.tagName === "BR") {
+        length += 1;
+      } else {
+        for (let child of node.childNodes) {
+          traverse(child);
+        }
+      }
+    }
+  }
+  traverse(container);
+  return length;
+}
+
+function getSelectionOffsets(container) {
+  if (!container) return null;
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || selection.rangeCount === 0) return null;
+
+  const range = selection.getRangeAt(0);
+
+  const startInside = container.contains(range.startContainer);
+  const endInside = container.contains(range.endContainer);
+
+  const isStartBefore = !startInside &&
+    Boolean(container.compareDocumentPosition(range.startContainer) & Node.DOCUMENT_POSITION_PRECEDING);
+  const isEndBefore = !endInside &&
+    Boolean(container.compareDocumentPosition(range.endContainer) & Node.DOCUMENT_POSITION_PRECEDING);
+
+  if (isStartBefore && isEndBefore) return null;
+
+  const isStartAfter = !startInside &&
+    Boolean(container.compareDocumentPosition(range.startContainer) & Node.DOCUMENT_POSITION_FOLLOWING);
+  const isEndAfter = !endInside &&
+    Boolean(container.compareDocumentPosition(range.endContainer) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+  if (isStartAfter && isEndAfter) return null;
+
+  let startOffset = 0;
+  if (startInside) {
+    startOffset = getCharOffsetInContainer(container, range.startContainer, range.startOffset);
+  } else if (isStartBefore) {
+    startOffset = 0;
+  } else if (isStartAfter) {
+    startOffset = getContainerTextLength(container);
+  }
+
+  let endOffset = 0;
+  if (endInside) {
+    endOffset = getCharOffsetInContainer(container, range.endContainer, range.endOffset);
+  } else if (isEndBefore) {
+    endOffset = 0;
+  } else if (isEndAfter) {
+    endOffset = getContainerTextLength(container);
+  }
+
+  if (startOffset >= endOffset) return null;
+
+  return { startOffset, endOffset, rawRange: range };
+}
+
+function getClampedBoundingRect(container, rawRange) {
+  const clampedRange = document.createRange();
+
+  if (container.contains(rawRange.startContainer)) {
+    clampedRange.setStart(rawRange.startContainer, rawRange.startOffset);
+  } else {
+    clampedRange.setStart(container, 0);
+  }
+
+  if (container.contains(rawRange.endContainer)) {
+    clampedRange.setEnd(rawRange.endContainer, rawRange.endOffset);
+  } else {
+    clampedRange.setEnd(container, container.childNodes.length);
+  }
+
+  return clampedRange.getBoundingClientRect();
+}
+
+export default function InterfaceCorrecao({ readOnly = false }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [essayData, setEssayData] = useState(null);
+  const [correctorName, setCorrectorName] = useState(null);
+
+  const [notasCompetencias, setNotasCompetencias] = useState({ c1: 0, c2: 0, c3: 0, c4: 0, c5: 0 });
   const [comentarios, setComentarios] = useState([]);
-  const [botaoFlutuante, setBotaoFlutuante] = useState({ visivel: false, x: 0, y: 0, texto: "", range: null });
-  const [hoveredComment, setHoveredComment] = useState(null); 
-  const [activePopoverComment, setActivePopoverComment] = useState(null); 
+
+  const [botaoFlutuante, setBotaoFlutuante] = useState({ visivel: false, x: 0, y: 0, startOffset: null, endOffset: null });
+  const [hoveredComment, setHoveredComment] = useState(null);
+  const [activePopoverComment, setActivePopoverComment] = useState(null);
 
   const redacaoRef = useRef(null);
-  const navigate = useNavigate();
 
   const notaTotal = Object.values(notasCompetencias).reduce((acc, curr) => acc + curr, 0);
 
-  const handleNotaChange = (id, valor) => {
+  useEffect(() => {
+    async function fetchDetail() {
+      try {
+        const response = await api.get(`/essay/${id}`);
+        const data = response.data;
+        setEssayData(data);
+
+        if (data.correction) {
+          setNotasCompetencias({
+            c1: data.correction.c1_score,
+            c2: data.correction.c2_score,
+            c3: data.correction.c3_score,
+            c4: data.correction.c4_score,
+            c5: data.correction.c5_score,
+          });
+          setCorrectorName(data.correction.corrector_name);
+
+          const comentariosCarregados = data.correction.comments.map(c => {
+            const compInfo = competenciasDisponiveis.find(cd => cd.id === c.competencia);
+            return {
+              id: String(c.id),
+              competencia: compInfo?.label ?? c.competencia,
+              cor: compInfo?.cor ?? "#999",
+              comentario: c.content,
+              startOffset: c.start_offset,
+              endOffset: c.end_offset,
+              isNovo: false,
+            };
+          });
+          setComentarios(comentariosCarregados);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar detalhe da redação:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchDetail();
+  }, [id]);
+
+  const htmlRedacao = useMemo(
+    () => construirHtmlComMarcacoes(essayData?.submitted_text, comentarios),
+    [essayData?.submitted_text, comentarios]
+  );
+
+  const handleNotaChange = (compId, valor) => {
+    if (readOnly) return;
     let num = parseInt(valor, 10) || 0;
     if (num < 0) num = 0;
     if (num > 200) num = 200;
-    
-    setNotasCompetencias(prev => ({
-      ...prev,
-      [id]: num
-    }));
+    setNotasCompetencias(prev => ({ ...prev, [compId]: num }));
   };
 
   useEffect(() => {
     const fecharMenusAoClicarFora = (e) => {
       if (
-        e.target.closest("mark") || 
-        e.target.closest(".comment-popover-card") || 
+        e.target.closest("mark") ||
+        e.target.closest(".comment-popover-card") ||
         e.target.closest(".btn-floating-comment")
       ) {
-        return; 
+        return;
       }
       setActivePopoverComment(null);
     };
@@ -68,88 +283,96 @@ export default function InterfaceCorrecao() {
     return () => window.removeEventListener("click", fecharMenusAoClicarFora);
   }, []);
 
-  const handleSelection = () => {
-    const selection = window.getSelection();
-    const textoSelecionado = selection.toString().trim();
+  useEffect(() => {
+    const processarSelecaoGlobal = (e) => {
+      if (readOnly || !redacaoRef.current) return;
 
-    if (textoSelecionado.length > 0 && redacaoRef.current.contains(selection.anchorNode)) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      const containerRect = redacaoRef.current.getBoundingClientRect();
+      if (e && e.target && e.target.closest && e.target.closest(".btn-floating-comment")) {
+        return;
+      }
 
-      setBotaoFlutuante({
-        visivel: true,
-        x: containerRect.right + 15, 
-        y: rect.top + window.scrollY, 
-        texto: textoSelecionado,
-        range: range.cloneRange()
-      });
-    } else {
       setTimeout(() => {
-        if (window.getSelection().toString().trim() === "") {
-          setBotaoFlutuante(prev => ({ ...prev, visivel: false }));
+        if (!redacaoRef.current) return;
+        const offsetsInfo = getSelectionOffsets(redacaoRef.current);
+
+        if (offsetsInfo && offsetsInfo.startOffset < offsetsInfo.endOffset) {
+          const rect = getClampedBoundingRect(redacaoRef.current, offsetsInfo.rawRange);
+          const containerRect = redacaoRef.current.getBoundingClientRect();
+
+          setBotaoFlutuante({
+            visivel: true,
+            x: containerRect.right + 15,
+            y: rect.top + window.scrollY,
+            startOffset: offsetsInfo.startOffset,
+            endOffset: offsetsInfo.endOffset
+          });
+        } else {
+          const sel = window.getSelection();
+          if (!sel || sel.isCollapsed || sel.toString().trim() === "") {
+            setBotaoFlutuante(prev => ({ ...prev, visivel: false }));
+          }
         }
-      }, 150);
-    }
-  };
+      }, 10);
+    };
+
+    document.addEventListener("mouseup", processarSelecaoGlobal);
+    document.addEventListener("keyup", processarSelecaoGlobal);
+
+    return () => {
+      document.removeEventListener("mouseup", processarSelecaoGlobal);
+      document.removeEventListener("keyup", processarSelecaoGlobal);
+    };
+  }, [readOnly]);
 
   const iniciarCriacaoComentario = (dadosOrigem = null) => {
+    if (readOnly || !redacaoRef.current) return;
+
     const info = dadosOrigem || botaoFlutuante;
-    if (!info.range) return;
+    if (typeof info.startOffset !== "number" || typeof info.endOffset !== "number") return;
+    if (info.startOffset >= info.endOffset) return;
 
     const idProvisorio = "temp-" + Date.now().toString();
     const compPadrao = competenciasDisponiveis[0];
 
-    const mark = document.createElement("mark");
-    mark.setAttribute("data-id", idProvisorio);
-    mark.style.backgroundColor = compPadrao.cor;
-    mark.style.color = "inherit";
-    mark.style.cursor = "pointer";
+    const novoEsboco = {
+      id: idProvisorio,
+      competencia: compPadrao.label,
+      cor: compPadrao.cor,
+      comentario: "",
+      startOffset: info.startOffset,
+      endOffset: info.endOffset,
+      isNovo: true
+    };
 
-    try {
-      info.range.surroundContents(mark);
-      
-      const novoEsboco = {
-        id: idProvisorio,
-        competencia: compPadrao.label,
-        cor: compPadrao.cor,
-        textoTrecho: info.texto,
-        comentario: "",
-        isNovo: true
-      };
+    setComentarios(prev => [...prev, novoEsboco]);
+    setBotaoFlutuante({ visivel: false, x: 0, y: 0, startOffset: null, endOffset: null });
 
-      setComentarios(prev => [...prev, novoEsboco]);
-      setBotaoFlutuante({ visivel: false, x: 0, y: 0, texto: "", range: null });
+    setTimeout(() => {
+      const markNode = redacaoRef.current?.querySelector(`mark[data-id="${idProvisorio}"]`);
+      if (markNode) {
+        const rect = markNode.getBoundingClientRect();
+        setActivePopoverComment({
+          id: idProvisorio,
+          top: rect.bottom + window.scrollY + 10,
+          left: rect.left + window.scrollX + rect.width / 2,
+          isEditing: true
+        });
+      }
+    }, 80);
 
-      setTimeout(() => {
-        const markNode = redacaoRef.current?.querySelector(`mark[data-id="${idProvisorio}"]`);
-        if (markNode) {
-          const rect = markNode.getBoundingClientRect();
-          setActivePopoverComment({
-            id: idProvisorio,
-            top: rect.bottom + window.scrollY + 10,
-            left: rect.left + window.scrollX + rect.width / 2,
-            isEditing: true
-          });
-        }
-      }, 60);
-
-    } catch (err) {
-      alert("Evite selecionar trechos que quebrem blocos internos de parágrafos.");
-    }
     window.getSelection().removeAllRanges();
   };
 
-  const handleTextClick = (e) => {
+  const handleTextClick = useCallback((e) => {
     let node = e.target;
     while (node && node !== redacaoRef.current) {
       if (node.tagName === "MARK") {
         const idDestaque = node.getAttribute("data-id");
         const rect = node.getBoundingClientRect();
-        
+
         setActivePopoverComment({
           id: idDestaque,
-          top: rect.bottom + window.scrollY + 10, 
+          top: rect.bottom + window.scrollY + 10,
           left: rect.left + window.scrollX + rect.width / 2,
           isEditing: false
         });
@@ -157,21 +380,21 @@ export default function InterfaceCorrecao() {
       }
       node = node.parentNode;
     }
-  };
+  }, []);
 
-  const handleMouseOverText = (e) => {
+  const handleMouseOverText = useCallback((e) => {
     let node = e.target;
     while (node && node !== redacaoRef.current) {
       if (node.tagName === "MARK") {
-        const id = node.getAttribute("data-id");
-        if (activePopoverComment && activePopoverComment.id === id) return;
+        const idc = node.getAttribute("data-id");
+        if (activePopoverComment && activePopoverComment.id === idc) return;
 
-        const comentarioObj = comentarios.find(c => c.id === id);
+        const comentarioObj = comentarios.find(c => c.id === idc);
         if (comentarioObj && comentarioObj.comentario) {
           const rect = node.getBoundingClientRect();
           setHoveredComment({
-            id,
-            top: rect.top + window.scrollY - 45, 
+            id: idc,
+            top: rect.top + window.scrollY - 45,
             left: rect.left + window.scrollX + rect.width / 2,
             texto: comentarioObj.comentario
           });
@@ -180,70 +403,62 @@ export default function InterfaceCorrecao() {
       }
       node = node.parentNode;
     }
-  };
+  }, [activePopoverComment, comentarios]);
 
-  const ocultarTooltip = () => setHoveredComment(null);
+  const ocultarTooltip = useCallback(() => setHoveredComment(null), []);
 
-  const consolidarComentarioDefinitivo = (id) => {
+  const consolidarComentarioDefinitivo = (idc) => {
+    if (readOnly) return;
     const novoIdDefinitivo = Date.now().toString();
-    const markNode = redacaoRef.current.querySelector(`mark[data-id="${id}"]`);
-    if (markNode) {
-      markNode.setAttribute("data-id", novoIdDefinitivo);
-    }
 
-    setComentarios(prev => prev.map(c => 
-      c.id === id ? { ...c, id: novoIdDefinitivo, isNovo: false } : c
+    setComentarios(prev => prev.map(c =>
+      c.id === idc ? { ...c, id: novoIdDefinitivo, isNovo: false } : c
     ));
     setActivePopoverComment(null);
   };
 
-  const removerApenasSelecao = (id) => {
-    const mark = redacaoRef.current.querySelector(`mark[data-id="${id}"]`);
-    if (mark) {
-      const pai = mark.parentNode;
-      while (mark.firstChild) {
-        pai.insertBefore(mark.firstChild, mark);
-      }
-      pai.removeChild(mark);
-    }
-    setComentarios(prev => prev.filter(c => c.id !== id));
+  const removerApenasSelecao = (idc) => {
+    if (readOnly) return;
+    setComentarios(prev => prev.filter(c => c.id !== idc));
     setActivePopoverComment(null);
   };
 
-  const alterarCompetenciaComentario = (id, labelCompetencia) => {
+  const alterarCompetenciaComentario = (idc, labelCompetencia) => {
+    if (readOnly) return;
     const novaComp = competenciasDisponiveis.find(c => c.label === labelCompetencia);
     if (!novaComp) return;
 
-    const markNode = redacaoRef.current.querySelector(`mark[data-id="${id}"]`);
-    if (markNode) markNode.style.backgroundColor = novaComp.cor;
-
-    setComentarios(prev => prev.map(c => 
-      c.id === id ? { ...c, competencia: novaComp.label, cor: novaComp.cor } : c
+    setComentarios(prev => prev.map(c =>
+      c.id === idc ? { ...c, competencia: novaComp.label, cor: novaComp.cor } : c
     ));
   };
 
-  const atualizarTextoComentario = (id, texto) => {
-    setComentarios(prev => prev.map(c => c.id === id ? { ...c, comentario: texto } : c));
+  const atualizarTextoComentario = (idc, texto) => {
+    if (readOnly) return;
+    setComentarios(prev => prev.map(c => c.id === idc ? { ...c, comentario: texto } : c));
   };
+
+  if (isLoading) return <LoadingScreen message="Carregando correção..." />;
 
   return (
     <div className="page-wrapper">
       <Header onProfileClick={() => {}} />
-      <SubHeader title="Nome do Aluno - Tema da redação" onBack={() => navigate(-1)} />
+      <SubHeader
+        title={essayData ? `${essayData.title}${correctorName ? " — Corrigido por " + correctorName : ""}` : ""}
+        onBack={() => navigate(-1)}
+      />
 
-      {/* 1. BALÃO SIMPLES DE LEITURA (HOVER) */}
       {hoveredComment && (
         <div className="comment-hover-tooltip" style={{ top: hoveredComment.top, left: hoveredComment.left }}>
           {hoveredComment.texto}
         </div>
       )}
 
-      {/* 2. CARD INTERATIVO FLUTUANTE */}
       {activePopoverComment && (() => {
         const item = comentarios.find(c => c.id === activePopoverComment.id);
         if (!item) return null;
         return (
-          <AnnotationForm 
+          <AnnotationForm
             competenciaSelecionada={item.competencia}
             onCompetenciaChange={(novaLabel) => alterarCompetenciaComentario(item.id, novaLabel)}
             competenciasDisponiveis={competenciasDisponiveis}
@@ -251,19 +466,19 @@ export default function InterfaceCorrecao() {
             onComentarioChange={(novoTxt) => atualizarTextoComentario(item.id, novoTxt)}
             isNovoComentario={!!item.isNovo}
             onCriarComentario={() => consolidarComentarioDefinitivo(item.id)}
-            
             isEditing={activePopoverComment.isEditing}
             onStartEdit={() => setActivePopoverComment(prev => ({ ...prev, isEditing: true }))}
             onSaveEdit={() => setActivePopoverComment(null)}
             onDelete={() => removerApenasSelecao(item.id)}
+            readOnly={readOnly}
             style={{ top: activePopoverComment.top, left: activePopoverComment.left }}
           />
         );
       })()}
 
-      {/* 3. BOTÃO FLUTUANTE PARA NOVO COMENTÁRIO */}
-      {botaoFlutuante.visivel && (
+      {!readOnly && botaoFlutuante.visivel && (
         <button
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => iniciarCriacaoComentario(botaoFlutuante)}
           className="btn-floating-comment"
           style={{ top: botaoFlutuante.y, left: botaoFlutuante.x }}
@@ -280,41 +495,28 @@ export default function InterfaceCorrecao() {
       <main className="main-correcao-container">
         <div className="layout-table">
           <div className="layout-row">
-            
-            {/* Coluna esquerda - Redação */}
             <div className="layout-col-esquerda">
-              <SupportTextsContainer items={[]} />
+              <SupportTextsContainer items={essayData?.support_texts ?? []} />
 
               <div className="nota-total-container">
                 <span className="nota-total-label">Nota Total Calculada:</span>
                 <span className="nota-total-badge">{notaTotal} pts</span>
               </div>
 
-              <div 
+              <TextoRedacao
                 ref={redacaoRef}
+                html={htmlRedacao}
                 onClick={handleTextClick}
-                onMouseUp={handleSelection}
-                onKeyUp={handleSelection}
                 onMouseOver={handleMouseOverText}
                 onMouseOut={ocultarTooltip}
-                className="container-redacao-correcao"
-              >
-                <p style={{ marginTop: 0 }}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sapien lectus, aliquam at dui sit amet, ornare lacinia nisi. Ut eros lacus, mollis ac auctor eget, suscipit quis lectus.
-                </p>
-                <p>
-                  In placerat cursus nisi, faucibus vestibulum mi tristique et. Sed ut neque ut quam semper tempus. Nam sit amet nisl porttitor, sagittis lorem sed, sollicitudin massa.
-                </p>
-              </div>
+                readOnly={readOnly}
+              />
             </div>
 
-            {/* Coluna direita - Tabela de Notas por Competência ENEM */}
             <div className="layout-col-direita">
               <div className="grade-notas-card">
-                <h3 className="grade-notas-titulo">
-                  Grade de Notas (ENEM)
-                </h3>
-                
+                <h3 className="grade-notas-titulo">Grade de Notas (ENEM)</h3>
+
                 <div className="tabela-competencias-wrapper">
                   <table className="tabela-competencias">
                     <thead>
@@ -327,7 +529,6 @@ export default function InterfaceCorrecao() {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* Linha 2: Descrição das Competências (Ofuscadas via CSS) */}
                       <tr>
                         {dadosCompetenciasEnem.map((comp) => (
                           <td key={comp.id} className={`comp-desc-cell comp-desc-${comp.id}`}>
@@ -335,11 +536,10 @@ export default function InterfaceCorrecao() {
                           </td>
                         ))}
                       </tr>
-                      {/* Linha 3: Inputs Customizados de Notas (0 a 200, step 40) */}
                       <tr>
                         {dadosCompetenciasEnem.map((comp) => (
                           <td key={comp.id} className="comp-input-cell">
-                            <input 
+                            <input
                               type="number"
                               min="0"
                               max="200"
@@ -347,6 +547,8 @@ export default function InterfaceCorrecao() {
                               value={notasCompetencias[comp.id]}
                               onChange={(e) => handleNotaChange(comp.id, e.target.value)}
                               className={`comp-input-field comp-input-${comp.id}`}
+                              disabled={readOnly}
+                              readOnly={readOnly}
                             />
                             <div className="comp-pts-label">pts</div>
                           </td>
@@ -356,15 +558,12 @@ export default function InterfaceCorrecao() {
                   </table>
                 </div>
 
-                {/* Resumo inferior */}
                 <div className="soma-final-container">
                   <span className="soma-final-label">Soma Final:</span>
                   <span className="soma-final-valor">{notaTotal} / 1000 pts</span>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       </main>

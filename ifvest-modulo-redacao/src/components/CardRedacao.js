@@ -1,7 +1,7 @@
 import "../styles/App.css"
-export function EssayTopicCard({ title, done = false, onClick }) {
-  const cardBg  = done ? "var(--fundo-feito)"  : "var(--fundo-nao-feito)";
-  const arrowBg = done ? "var(--btn-feito)" : "var(--btn-nao-feito)";
+export function EssayTopicCard({ title, status = "not_done", onClick }) {
+  const cardBg  = status === "done" ? "var(--fundo-feito)"  : "var(--fundo-nao-feito)";
+  const arrowBg = status === "done" ? "var(--btn-feito)" : "var(--btn-nao-feito)";
 
   return (
     <div

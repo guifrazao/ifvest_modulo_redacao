@@ -21,7 +21,8 @@ function App() {
           <Route path="/professor" element={<InterfaceProf/>}/>
           <Route path="/proposta/:id" element={<InterfaceRedacao/>}/>
           <Route path="/criar_redacao" element={<InterfaceCriarRedacao/>}/>
-          <Route path="/correcao" element={<InterfaceCorrecao/>}/>
+          <Route path="/correcao/:id" element={<InterfaceCorrecao readOnly={true}/>}/>
+          <Route path="/corrigir/:id" element={<InterfaceCorrecao readOnly={false}/>}/>
           <Route path="/area_aluno" element={<InterfaceAreaAluno/>}/>
           <Route path="/area_corretor" element={<InterfaceAreaCorretor/>}/>
         </Routes>

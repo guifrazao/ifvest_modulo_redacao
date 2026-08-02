@@ -18,7 +18,7 @@ export default function InterfaceAreaAluno() {
   useEffect(() => {
     async function fetchEssays() {
       try {
-        const response = await api.get(`/redacao/usuario/${idUsuario}/`);
+        const response = await api.get(`/essay/user/${idUsuario}/`);
         setEssays(response.data);
       } catch (error) {
         console.error("Erro ao carregar redações:", error);
@@ -30,7 +30,7 @@ export default function InterfaceAreaAluno() {
   }, []);
 
   const handleCardClick = (id) => {
-    navigate(`/redacao/${id}`);
+    navigate(`/correcao/${id}`);
   };
 
   function formatDate(isoString) {

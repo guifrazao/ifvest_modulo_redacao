@@ -11,6 +11,8 @@ import { Footer } from '../components/Footer.js';
 import { ActionButton } from '../components/BotaoAcao.js';
 import { LoadingScreen } from '../components/TelaCarregamento.js';
 
+/* TODO: Sinalização do status de progresso da redação/correção (não feita/aguardando correção/feita), implementar paginação */
+
 export default function InterfaceProf() {
   const [page,  setPage]  = useState(1);
   const [query, setQuery] = useState("");

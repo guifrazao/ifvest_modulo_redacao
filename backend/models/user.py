@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from .support_text import SupportText
     from .proposta import Proposta
     from .essay import Essay
+    from .correction import Correction
 
 class UserBase(SQLModel):
     name: str = Field(index=True)
@@ -16,7 +17,8 @@ class User(UserBase, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     
-    proposta_links: List["Essay"] = Relationship(back_populates="user") 
+    proposta_links: List["Essay"] = Relationship(back_populates="user")
+    corrections_made: List["Correction"] = Relationship (back_populates="corrector")
 
 class UserPublic(UserBase):
     id: int

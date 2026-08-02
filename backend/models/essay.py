@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .support_text import SupportText
     from .proposta import Proposta
     from .user import User
+    from .correction import Correction
 
 class EssayBase(SQLModel):
     submitted_text: Optional[str] = Field(default=None,index=True)
@@ -29,6 +30,7 @@ class Essay(EssayBase, table=True):
     proposta_id: Optional[int] = Field(default=None, foreign_key="propostas.id_proposta")
     user: "User" = Relationship(back_populates="proposta_links")
     proposta: "Proposta" = Relationship(back_populates="user_links")
+    correction: "Correction" = Relationship(back_populates="essay")
 
 class EssayPublic(EssayBase):
     id: int

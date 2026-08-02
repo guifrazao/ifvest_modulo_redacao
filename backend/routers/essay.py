@@ -4,11 +4,11 @@ from sqlmodel import Session, select
 from datetime import datetime
 from database import get_session
 from models import Essay, EssayPublic, EssayCreate, Proposta, User
-from schemas import EssayWithProposta
+from schemas import EssayWithProposta, EssayWithPropostaDetail
 
 router = APIRouter(
-    prefix = "/redacao",
-    tags = ["redacao"]
+    prefix = "/essay",
+    tags = ["essay"]
 )
 
 @router.post("/create/", response_model=EssayPublic)
@@ -39,7 +39,48 @@ def create_essay(
 
     return db_essay
 
-@router.get("/usuario/{user_id}/", response_model=List[EssayWithProposta])
+@router.get("/{essay_id}", response_model=EssayWithPropostaDetail)
+def get_essay_by_id(
+    *,
+    session: Session = Depends(get_session),
+    essay_id: int
+):
+    statement = select(Essay).where(Essay.id == essay_id)
+    essay = session.exec(statement).one()
+
+    result = EssayWithPropostaDetail(
+        id=essay.id,
+        status=essay.status,
+        title=essay.proposta.title,
+        submitted_text=essay.submitted_text,
+        image_url=essay.image_url,
+        submitted_at=essay.submitted_at,
+    )
+
+    return result
+
+@router.get("/pending/", response_model=List[EssayWithProposta])
+def get_pending_essays(
+    *,
+    session: Session = Depends(get_session)
+):
+    statement = select(Essay).where(Essay.status != "done")
+    essays = session.exec(statement).all()
+
+    result = []
+    for essay in essays:
+        result.append(EssayWithProposta(
+            id=essay.id,
+            submitted_text=essay.submitted_text,
+            image_url=essay.image_url,
+            submitted_at=essay.submitted_at,
+            status=essay.status,
+            title=essay.proposta.title,
+        ))
+
+    return result
+
+@router.get("/user/{user_id}/", response_model=List[EssayWithProposta])
 def get_essays_by_user(
     *,
     session: Session = Depends(get_session),

@@ -12,7 +12,7 @@ import { Footer } from '../components/Footer.js';
 import { ActionButton } from '../components/BotaoAcao.js';
 import { LoadingScreen } from '../components/TelaCarregamento.js';
 
-/* TODO: Sinalização do status de progresso da redação/correção (não feita/aguardando correção/feita) */
+/* TODO: Sinalização do status de progresso da redação/correção (não feita/aguardando correção/feita), implementar paginação */
 
 export default function InterfacePrincipal() {
   const [page,  setPage]  = useState(1);
@@ -35,7 +35,6 @@ export default function InterfacePrincipal() {
           done: false
         }));
     
-        console.log(propostas)
         setTopics(propostas)
         setIsLoading(false);
       }catch (error){

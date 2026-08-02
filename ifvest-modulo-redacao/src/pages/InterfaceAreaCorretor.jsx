@@ -1,18 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import T from "../styles/tokens.js";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import api from "../api.js";
 import { Header } from "../components/Header.js";
 import { SubHeader } from "../components/SubHeader.js";
 import { PaginationBar } from "../components/Paginacao.js";
 import { Footer } from "../components/Footer.js";
 import { CorrectionTopicCard } from "../components/CardRedacaoAluno.js";
+import { LoadingScreen } from "../components/TelaCarregamento.js";
 
 export default function InterfaceAreaCorretor() {
+  const [pendingEssays, setPendingEssays] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function fetchPendingEssays() {
+      try {
+        const response = await api.get("/essay/pending/");
+        setPendingEssays(response.data);
+      } catch (error) {
+        console.error("Erro ao carregar redações aguardando correção:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPendingEssays();
+  }, []);
+
   const handleCardClick = (id) => {
-    console.log(`Abrir redação com ID: ${id}`);
+    // Redireciona para a tela de correção passando o ID da redação
+    navigate(`/corrigir/${id}`);
   };
 
-  const navigate = useNavigate();
+  function formatDate(isoString) {
+    return new Date(isoString).toLocaleDateString("pt-BR");
+  }
+
+  if (isLoading) return <LoadingScreen message="Carregando redações para correção..." />;
 
   return (
     <div style={{
@@ -37,7 +62,7 @@ export default function InterfaceAreaCorretor() {
         boxSizing: "border-box"
       }}>
         
-        {/* Aguardando correção */}
+        {/* Redações Aguardando Correção */}
         <section style={{ marginBottom: "28px" }}>
           <h2 style={{
             fontSize: "12px",
@@ -55,22 +80,23 @@ export default function InterfaceAreaCorretor() {
             gap: "20px",
             flexWrap: "wrap"
           }}>
-            <CorrectionTopicCard 
-              title="Perspectiva acerca do envelhecimento na sociedade brasileira"
-              done={false}
-              submissionDate="13/05/2026"
-              onClick={() => handleCardClick(1)}
-            />
-            <CorrectionTopicCard 
-              title="Perspectiva acerca do envelhecimento na sociedade brasileira"
-              done={false}
-              submissionDate="13/05/2026"
-              onClick={() => handleCardClick(2)}
-            />
+            {pendingEssays.length > 0 ? (
+              pendingEssays.map(essay => (
+                <CorrectionTopicCard 
+                  key={essay.id}
+                  title={essay.title}
+                  done={false}
+                  submissionDate={formatDate(essay.submitted_at)}
+                  onClick={() => handleCardClick(essay.id)}
+                />
+              ))
+            ) : (
+              <p style={{ fontSize: 14, color: "#888" }}>Nenhuma redação aguardando correção no momento.</p>
+            )}
           </div>
         </section>
 
-        {/* Redações corrigidas */}
+        {/* Redações Corrigidas por Mim (Mantenha estático ou integre futuramente com as correções salvas) */}
         <section style={{ marginBottom: "40px" }}>
           <h2 style={{
             fontSize: "12px",
@@ -88,22 +114,7 @@ export default function InterfaceAreaCorretor() {
             gap: "20px",
             flexWrap: "wrap"
           }}>
-            <CorrectionTopicCard 
-              title="Perspectiva acerca do envelhecimento na sociedade brasileira"
-              done={true}
-              correctionDate="13/05/2026"
-              score="800,0"
-              correctorName="EXEMPLO DA SILVA"
-              onClick={() => handleCardClick(3)}
-            />
-            <CorrectionTopicCard 
-              title="Perspectiva acerca do envelhecimento na sociedade brasileira"
-              done={true}
-              correctionDate="13/05/2026"
-              score="800,0"
-              correctorName="EXEMPLO DA SILVA"
-              onClick={() => handleCardClick(3)}
-            />
+            {/* Mantido temporariamente conforme seu código original */}
           </div>
         </section>
 

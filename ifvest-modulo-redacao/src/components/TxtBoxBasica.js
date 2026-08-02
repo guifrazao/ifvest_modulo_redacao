@@ -1,5 +1,5 @@
 import T from "../styles/tokens"
-export default function BasicTxtBox({ placeholder, essayText, setEssayText }){
+export default function BasicTxtBox({ placeholder, essayText, setEssayText, lineHeight = "auto" }){
     return (
         <textarea
           value={essayText}
@@ -10,6 +10,7 @@ export default function BasicTxtBox({ placeholder, essayText, setEssayText }){
             width: "100%",
             height: "100%", 
             minHeight: 160,
+            lineHeight: lineHeight,
             border: `1px solid ${T.bordaTab}`,
             padding: "10px 12px", fontSize: 13,
             fontFamily: "Roboto, sans-serif", color: "#000",

@@ -7,18 +7,15 @@ import { SupportTextsContainer } from "../components/ContainerTextosApoio";
 import { Footer } from "../components/Footer";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PaginationBar } from "../components/Paginacao";
 import { EssayWritingBox } from "../components/AreaRedacao";
-import BasicTxtBox from "../components/TxtBoxBasica";
 import { ActionButton } from "../components/BotaoAcao";
-import { SupportTextItem } from "../components/TextoApoio";
 import { LoadingScreen } from "../components/TelaCarregamento.js";
 import { idUsuario } from "../globals.js"
 
+/* TODO: Mudar lineHeight da área de digitação, implementar orientações abaixo dos textos de apoio (redija uma redação com o tema...), dar mais destaque ao título*/
+
 export default function InterfaceRedacao(){
-
-
-    const [page,  setPage]  = useState(1);
+  
     const [componentList, setComponentList] = useState([]);
     const [essayTitle, setEssayTitle] = useState("");
     const [essayText, setEssayText] = useState("");
@@ -34,7 +31,7 @@ export default function InterfaceRedacao(){
         }
 
         try {
-            const response = await api.post("/redacao/create/", {
+            const response = await api.post("/essay/create/", {
                 submitted_text: essayText,
                 image_url: null,
                 submitted_at: new Date().toISOString(),

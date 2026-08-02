@@ -13,14 +13,18 @@ export function AnnotationForm({
   isEditing,
   onStartEdit,
   onSaveEdit,
+  readOnly = false,
   style
 }) {
   const competenciaAtual = competenciasDisponiveis.find(c => c.label === competenciaSelecionada) || competenciasDisponiveis[0];
 
+  // No modo readOnly, força sempre a visualização (nunca criação/edição)
+  const mostrarModoEdicao = !readOnly && (isNovoComentario || isEditing);
+
   return (
     <div className="comment-popover-card" style={style}>
-      {/* ── MOTO DE VISUALIZAÇÃO/LEITURA ── */}
-      {!isNovoComentario && !isEditing ? (
+      {/* Modo leitura */}
+      {!mostrarModoEdicao ? (
         <div>
           <div className="popover-header">
             <div className="badge-competencia-view">
@@ -33,10 +37,12 @@ export function AnnotationForm({
             {comentario || <em>Nenhum comentário inserido.</em>}
           </p>
 
-          <div className="popover-actions-wrapper">
-            <ActionButton onClick={onStartEdit} text="Editar" color="#f0f0f0" textColor="#2d6a4f" borderRadius={20} />
-            <ActionButton onClick={onDelete} text="Excluir" color="#fbebeb" textColor="#dc3545" borderRadius={20} />
-          </div>
+          {!readOnly && (
+            <div className="popover-actions-wrapper">
+              <ActionButton onClick={onStartEdit} text="Editar" color="#f0f0f0" textColor="#2d6a4f" borderRadius={20} />
+              <ActionButton onClick={onDelete} text="Excluir" color="#fbebeb" textColor="#dc3545" borderRadius={20} />
+            </div>
+          )}
         </div>
       ) : (
 

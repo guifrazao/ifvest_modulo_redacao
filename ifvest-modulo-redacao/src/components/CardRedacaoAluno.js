@@ -2,15 +2,15 @@ import T from "../styles/tokens.js";
 
 export function CorrectionTopicCard({ 
   title, 
-  done = false, 
+  status = "not_done", 
   onClick, 
   submissionDate, 
   correctionDate, 
   score, 
   correctorName 
 }) {
-  const cardBg  = done ? T.fundoFeito  : T.fundoNaoFeito;
-  const arrowBg = done ? T.btnFeito : T.btnNaoFeito;
+  const cardBg  = status === "done" ? T.fundoFeito  : T.fundoNaoFeito;
+  const arrowBg = status === "done" ? T.btnFeito : T.btnNaoFeito;
 
   return (
     <div
@@ -54,8 +54,8 @@ export function CorrectionTopicCard({
           fontFamily: "'Roboto', sans-serif"
         }}>
           <span>
-            {done ? "Data de correção: " : "Data de envio: "}
-            <span style={{ color: "#757575" }}>{done ? correctionDate : submissionDate}</span>
+            {status ? "Data de correção: " : "Data de envio: "}
+            <span style={{ color: "#757575" }}>{status ? correctionDate : submissionDate}</span>
           </span>
           
           <span>
