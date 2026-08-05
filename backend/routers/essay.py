@@ -55,6 +55,7 @@ def get_essay_by_id(
         submitted_text=essay.submitted_text,
         image_url=essay.image_url,
         submitted_at=essay.submitted_at,
+        support_texts=essay.proposta.support_texts
     )
 
     return result

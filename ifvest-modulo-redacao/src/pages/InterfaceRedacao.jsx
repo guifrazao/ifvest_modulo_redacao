@@ -41,7 +41,7 @@ export default function InterfaceRedacao(){
 
             console.log("Redação criada:", response.data);
             alert("Sua redação foi enviada para correção");
-            navigate("/area_aluno/")
+            navigate("/area/")
         } catch (error) {
             console.error("Erro ao criar redação:", error);
             alert("Não foi possível enviar a redação");

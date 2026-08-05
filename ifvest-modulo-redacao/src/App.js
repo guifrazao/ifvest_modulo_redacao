@@ -1,5 +1,5 @@
 import './styles/App.css'
-import { tipoUsuario, rotaPrincipal } from "./globals.js"
+import { tipoUsuario, rotaPrincipal, rotaArea } from "./globals.js"
 import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
 import InterfacePrincipal from './pages/InterfacePrincipal';
 import InterfaceProf from './pages/InterfacePrincipalProfessor';
@@ -23,6 +23,7 @@ function App() {
           <Route path="/criar_redacao" element={<InterfaceCriarRedacao/>}/>
           <Route path="/correcao/:id" element={<InterfaceCorrecao readOnly={true}/>}/>
           <Route path="/corrigir/:id" element={<InterfaceCorrecao readOnly={false}/>}/>
+          <Route path="/area" element={<Navigate to={rotaArea} replace />}/>
           <Route path="/area_aluno" element={<InterfaceAreaAluno/>}/>
           <Route path="/area_corretor" element={<InterfaceAreaCorretor/>}/>
         </Routes>

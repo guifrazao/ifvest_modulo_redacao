@@ -1,4 +1,5 @@
-from models import EssayPublic
+from models import EssayPublic, SupportTextPublic
+from typing import List
 
 class EssayWithProposta(EssayPublic):
     status: str
@@ -6,3 +7,4 @@ class EssayWithProposta(EssayPublic):
 
 class EssayWithPropostaDetail(EssayWithProposta):
     submitted_text: str
+    support_texts: List[SupportTextPublic]

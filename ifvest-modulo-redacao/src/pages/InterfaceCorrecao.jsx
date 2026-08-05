@@ -13,7 +13,7 @@ import { LoadingScreen } from "../components/TelaCarregamento";
 
 const competenciasDisponiveis = [
   { id: "c1", label: "Competência 1", cor: "#fbc02d" },
-  { id: "c2", label: "Competência 2", cor: "#f44336" },
+  { id: "c2", label: "Competência 2", cor: "#82f436" },
   { id: "c3", label: "Competência 3", cor: "#e91e63" },
   { id: "c4", label: "Competência 4", cor: "#2196f3" },
   { id: "c5", label: "Competência 5", cor: "#9c27b0" },
@@ -318,10 +318,10 @@ const decrementarNota = (compId) => {
         comment_ids
       })
       alert("Correção enviada com sucesso")
-      navigate("/area_corretor/")
+      navigate("/area/")
     }catch (error){
       console.error("Erro ao enviar correção: ", error)
-      alert("Erro ao enviar correção", error)
+      alert("Erro ao enviar correção")
     }
   }
 
