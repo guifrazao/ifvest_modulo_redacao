@@ -50,4 +50,14 @@ def create_correction(
     session.commit()
     session.refresh(db_correction)
 
-    return db_correction
+    return CorrectionPublic(
+        id=db_correction.id,
+        c1_score=correction.c1_score,
+        c2_score=correction.c2_score,
+        c3_score=correction.c3_score,
+        c4_score=correction.c4_score,
+        c5_score=correction.c5_score,
+        corrected_at=correction.corrected_at,
+        corrector_name=corrector.name,
+        comments=db_comments,
+    )

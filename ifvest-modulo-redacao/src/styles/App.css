@@ -822,15 +822,32 @@
       background: #ffffff;
     }
 
-    .comp-input-field {
-      width: 85%;
-      padding: 6px 4px;
+    .comp-stepper-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .comp-stepper-btn {
+      width: 24px;
+      height: 24px;
       border-radius: 6px;
-      text-align: center;
-      font-size: 13px;
+      border: none;
+      cursor: pointer;
       font-weight: bold;
-      outline: none;
-      background: #fdfdfd;
+      background: #e0e0e0;
+    }
+
+    .comp-stepper-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .comp-input-field {
+      width: 48px;
+      text-align: center;
+      cursor: default;
     }
 
     .comp-pts-label {

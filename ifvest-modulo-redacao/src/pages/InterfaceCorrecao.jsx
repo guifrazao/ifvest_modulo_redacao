@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api.js";
 import T from "../styles/tokens";
+import { idCorretor } from "../globals.js";
 import { Header } from "../components/Header";
 import { SubHeader } from "../components/SubHeader";
 import { Footer } from "../components/Footer";
+import { ActionButton } from "../components/BotaoAcao.js";
 import { AnnotationForm } from "../components/FormComentario";
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
 import { LoadingScreen } from "../components/TelaCarregamento";
@@ -24,6 +26,7 @@ const dadosCompetenciasEnem = [
   { id: "c4", nome: "Competência 4", desc: "Demonstrar conhecimento dos mecanismos linguísticos necessários para a construção da argumentação." },
   { id: "c5", nome: "Competência 5", desc: "Elaborar proposta de intervenção para o problema abordado, que respeite os direitos humanos." }
 ];
+
 
 /* Componente memoizado para impedir que a seleção do DOM seja limpa em re-renderizações do pai */
 const TextoRedacao = React.memo(
@@ -215,6 +218,26 @@ export default function InterfaceCorrecao({ readOnly = false }) {
 
   const notaTotal = Object.values(notasCompetencias).reduce((acc, curr) => acc + curr, 0);
 
+  const notasValidas = [0, 40, 80, 120, 160, 200];
+
+  const incrementarNota = (compId) => {
+    if (readOnly) return;
+    setNotasCompetencias(prev => {
+      const atual = prev[compId];
+      const proxima = Math.min(atual + 40, 200);
+      return { ...prev, [compId]: proxima };
+    });
+  };
+
+const decrementarNota = (compId) => {
+  if (readOnly) return;
+  setNotasCompetencias(prev => {
+    const atual = prev[compId];
+    const anterior = Math.max(atual - 40, 0);
+    return { ...prev, [compId]: anterior };
+  });
+};
+
   useEffect(() => {
     async function fetchDetail() {
       try {
@@ -233,10 +256,10 @@ export default function InterfaceCorrecao({ readOnly = false }) {
           setCorrectorName(data.correction.corrector_name);
 
           const comentariosCarregados = data.correction.comments.map(c => {
-            const compInfo = competenciasDisponiveis.find(cd => cd.id === c.competencia);
+            const compInfo = competenciasDisponiveis.find(cd => cd.id === c.competence);
             return {
               id: String(c.id),
-              competencia: compInfo?.label ?? c.competencia,
+              competencia: compInfo?.label ?? c.competence,
               cor: compInfo?.cor ?? "#999",
               comentario: c.content,
               startOffset: c.start_offset,
@@ -254,6 +277,53 @@ export default function InterfaceCorrecao({ readOnly = false }) {
     }
     fetchDetail();
   }, [id]);
+
+  //Converte label da tabela de competências (Competência 1, etc) para o atributo no banco de dados (c1, etc)
+  function converterLabelParaId(label) {
+    const comp = competenciasDisponiveis.find(c => c.label === label);
+    return comp ? comp.id : label;
+  }
+
+  async function handleCorrectionSubmit() {
+
+    //Caso algum comentário não exista no banco, ele é armazenado
+    try{
+      const comentariosNovos = comentarios.filter(c => c.isNovo);
+      const comentariosSalvos = comentarios.filter(c => !c.isNovo);
+
+      const criados = await Promise.all(
+        comentariosNovos.map(c => {
+          api.post("/comment/create/", {
+            competence: converterLabelParaId(c.competence),
+            content: c.comentario,
+            start_offset: c.startOffset,
+            end_offset: c.endOffset,
+          })
+        })
+      )
+
+      const idsNovos = criados.map(r => r.data.id)
+      const idsSalvos = comentariosSalvos.map(c => Number(c.id))
+      const comment_ids = [...idsSalvos, ...idsNovos]
+
+      await api.post("/correction/create/", {
+        c1_score: notasCompetencias.c1,
+        c2_score: notasCompetencias.c2,
+        c3_score: notasCompetencias.c3,
+        c4_score: notasCompetencias.c4,
+        c5_score: notasCompetencias.c5,
+        corrected_at: new Date().toISOString(),
+        essay_id: Number(id),
+        corrector_id: idCorretor,
+        comment_ids
+      })
+      alert("Correção enviada com sucesso")
+      navigate("/area_corretor/")
+    }catch (error){
+      console.error("Erro ao enviar correção: ", error)
+      alert("Erro ao enviar correção", error)
+    }
+  }
 
   const htmlRedacao = useMemo(
     () => construirHtmlComMarcacoes(essayData?.submitted_text, comentarios),
@@ -511,6 +581,17 @@ export default function InterfaceCorrecao({ readOnly = false }) {
                 onMouseOut={ocultarTooltip}
                 readOnly={readOnly}
               />
+
+              <div style={{marginTop: "12px"}}>
+                <ActionButton 
+                  onClick={handleCorrectionSubmit}
+                  text="Enviar correção"
+                  color="var(--btn-correcao-ia)"
+                  textColor="#ffffff"
+                  borderRadius={8}
+                  width={"100%"}
+                />
+              </div>
             </div>
 
             <div className="layout-col-direita">
@@ -539,17 +620,38 @@ export default function InterfaceCorrecao({ readOnly = false }) {
                       <tr>
                         {dadosCompetenciasEnem.map((comp) => (
                           <td key={comp.id} className="comp-input-cell">
-                            <input
-                              type="number"
-                              min="0"
-                              max="200"
-                              step="40"
-                              value={notasCompetencias[comp.id]}
-                              onChange={(e) => handleNotaChange(comp.id, e.target.value)}
-                              className={`comp-input-field comp-input-${comp.id}`}
-                              disabled={readOnly}
-                              readOnly={readOnly}
-                            />
+                            <div className="comp-stepper-wrapper">
+                              <button
+                                type="button"
+                                onClick={() => decrementarNota(comp.id)}
+                                disabled={readOnly || notasCompetencias[comp.id] <= 0}
+                                className="comp-stepper-btn comp-stepper-btn-minus"
+                                aria-label={`Diminuir nota da ${comp.nome}`}
+                              >
+                                −
+                              </button>
+
+                              <input
+                                type="text"
+                                inputMode="none"     
+                                value={notasCompetencias[comp.id]}
+                                readOnly
+                                onKeyDown={(e) => e.preventDefault()}
+                                onPaste={(e) => e.preventDefault()}
+                                className={`comp-input-field comp-input-${comp.id}`}
+                                aria-label={`Nota da ${comp.nome}`}
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() => incrementarNota(comp.id)}
+                                disabled={readOnly || notasCompetencias[comp.id] >= 200}
+                                className="comp-stepper-btn comp-stepper-btn-plus"
+                                aria-label={`Aumentar nota da ${comp.nome}`}
+                              >
+                                +
+                              </button>
+                            </div>
                             <div className="comp-pts-label">pts</div>
                           </td>
                         ))}
