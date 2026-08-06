@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { EssayWritingBox } from "../components/AreaRedacao";
 import { ActionButton } from "../components/BotaoAcao";
 import { LoadingScreen } from "../components/TelaCarregamento.js";
-import { idUsuario } from "../globals.js"
+import { idUsuario, rotaArea } from "../globals.js"
 
 /* TODO: Mudar lineHeight da área de digitação, implementar orientações abaixo dos textos de apoio (redija uma redação com o tema...), dar mais destaque ao título*/
 
@@ -41,7 +41,7 @@ export default function InterfaceRedacao(){
 
             console.log("Redação criada:", response.data);
             alert("Sua redação foi enviada para correção");
-            navigate("/area/")
+            navigate(rotaArea)
         } catch (error) {
             console.error("Erro ao criar redação:", error);
             alert("Não foi possível enviar a redação");

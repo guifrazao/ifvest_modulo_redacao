@@ -1,5 +1,5 @@
-from models import EssayPublic, SupportTextPublic
-from typing import List
+from models import EssayPublic, SupportTextPublic, CorrectionPublic
+from typing import List, Optional
 
 class EssayWithProposta(EssayPublic):
     status: str
@@ -8,3 +8,4 @@ class EssayWithProposta(EssayPublic):
 class EssayWithPropostaDetail(EssayWithProposta):
     submitted_text: str
     support_texts: List[SupportTextPublic]
+    correction: Optional[CorrectionPublic] = None

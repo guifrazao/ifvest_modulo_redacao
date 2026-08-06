@@ -37,6 +37,14 @@ class CorrectionCreate(CorrectionBase):
     corrector_id: int
     comment_ids: List[int]
 
+class CorrectionUpdate(CorrectionBase):
+    c1_score: Optional[int] = Field(default=None, ge=0, le=200)
+    c2_score: Optional[int] = Field(default=None, ge=0, le=200)
+    c3_score: Optional[int] = Field(default=None, ge=0, le=200)
+    c4_score: Optional[int] = Field(default=None, ge=0, le=200)
+    c5_score: Optional[int] = Field(default=None, ge=0, le=200)
+    comment_ids: Optional[List[int]] = None
+
 try:
     from .essay import Essay
     from .user import User
@@ -44,5 +52,6 @@ try:
     Correction.model_rebuild()
     CorrectionPublic.model_rebuild()
     CorrectionCreate.model_rebuild()
+    CorrectionUpdate.model_rebuild()
 except Exception as e:
     print(f"Erro models correction: {e}")

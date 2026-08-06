@@ -285,6 +285,7 @@ const decrementarNota = (compId) => {
   }
 
   async function handleCorrectionSubmit() {
+    const possuiCorrecao = essayData?.correction != null; //Pra decidir se irá chamar requisição de criação ou edição
 
     //Caso algum comentário não exista no banco, ele é armazenado
     try{
@@ -292,31 +293,39 @@ const decrementarNota = (compId) => {
       const comentariosSalvos = comentarios.filter(c => !c.isNovo);
 
       const criados = await Promise.all(
-        comentariosNovos.map(c => {
+        comentariosNovos.map(c => 
           api.post("/comment/create/", {
-            competence: converterLabelParaId(c.competence),
+            competence: converterLabelParaId(c.competencia),
             content: c.comentario,
             start_offset: c.startOffset,
             end_offset: c.endOffset,
           })
-        })
+        )
       )
 
       const idsNovos = criados.map(r => r.data.id)
       const idsSalvos = comentariosSalvos.map(c => Number(c.id))
       const comment_ids = [...idsSalvos, ...idsNovos]
 
-      await api.post("/correction/create/", {
+      const payload = {
         c1_score: notasCompetencias.c1,
         c2_score: notasCompetencias.c2,
         c3_score: notasCompetencias.c3,
         c4_score: notasCompetencias.c4,
         c5_score: notasCompetencias.c5,
-        corrected_at: new Date().toISOString(),
-        essay_id: Number(id),
-        corrector_id: idCorretor,
-        comment_ids
-      })
+        comment_ids,
+      }
+
+      if (possuiCorrecao){
+        await api.put(`/correction/${id}/`, payload)
+      }else{
+        await api.post("/correction/create/", {
+          ...payload,
+          corrected_at: new Date().toISOString(),
+          essay_id: Number(id),
+          corrector_id: idCorretor,
+        })
+      }
       alert("Correção enviada com sucesso")
       navigate("/area/")
     }catch (error){
@@ -329,6 +338,16 @@ const decrementarNota = (compId) => {
     () => construirHtmlComMarcacoes(essayData?.submitted_text, comentarios),
     [essayData?.submitted_text, comentarios]
   );
+
+  const supportTextItems = useMemo(() => {
+    const textos = essayData?.support_texts ?? []
+    return textos.map((st, index) => ({
+      type: st.type,
+      label: `TEXTO ${index + 1}`,
+      title: st.title,
+      body: st.content,
+    }))
+  }, [essayData?.support_texts])
 
   const handleNotaChange = (compId, valor) => {
     if (readOnly) return;
@@ -479,11 +498,6 @@ const decrementarNota = (compId) => {
 
   const consolidarComentarioDefinitivo = (idc) => {
     if (readOnly) return;
-    const novoIdDefinitivo = Date.now().toString();
-
-    setComentarios(prev => prev.map(c =>
-      c.id === idc ? { ...c, id: novoIdDefinitivo, isNovo: false } : c
-    ));
     setActivePopoverComment(null);
   };
 
@@ -566,7 +580,7 @@ const decrementarNota = (compId) => {
         <div className="layout-table">
           <div className="layout-row">
             <div className="layout-col-esquerda">
-              <SupportTextsContainer items={essayData?.support_texts ?? []} />
+              <SupportTextsContainer items={supportTextItems} />
 
               <div className="nota-total-container">
                 <span className="nota-total-label">Nota Total Calculada:</span>

@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 from datetime import datetime
 from database import get_session
 from models import Essay, EssayPublic, EssayCreate, Proposta, User
-from schemas import EssayWithProposta, EssayWithPropostaDetail
+from schemas import EssayWithProposta, EssayWithPropostaDetail, CorrectionPublic
 
 router = APIRouter(
     prefix = "/essay",
@@ -48,6 +48,20 @@ def get_essay_by_id(
     statement = select(Essay).where(Essay.id == essay_id)
     essay = session.exec(statement).one()
 
+    correction_public = None
+    if essay.correction is not None:
+        correction_public = CorrectionPublic(
+            id=essay.correction.id,
+            c1_score=essay.correction.c1_score,
+            c2_score=essay.correction.c2_score,
+            c3_score=essay.correction.c3_score,
+            c4_score=essay.correction.c4_score,
+            c5_score=essay.correction.c5_score,
+            corrected_at=essay.correction.corrected_at,
+            corrector_name=essay.correction.corrector.name,
+            comments=essay.correction.comments,
+        )
+
     result = EssayWithPropostaDetail(
         id=essay.id,
         status=essay.status,
@@ -55,7 +69,8 @@ def get_essay_by_id(
         submitted_text=essay.submitted_text,
         image_url=essay.image_url,
         submitted_at=essay.submitted_at,
-        support_texts=essay.proposta.support_texts
+        support_texts=essay.proposta.support_texts,
+        correction=correction_public,
     )
 
     return result

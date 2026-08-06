@@ -16,8 +16,8 @@ class Comment(CommentBase, table=True):
     __tablename__ = "comments"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    correction_id: Optional[int] = Field(foreign_key="corrections.id")
-    correction: "Correction" = Relationship(back_populates="comments")
+    correction_id: Optional[int] = Field(default=None,foreign_key="corrections.id")
+    correction: Optional["Correction"] = Relationship(back_populates="comments")
 
 class CommentPublic(CommentBase):
     id: int

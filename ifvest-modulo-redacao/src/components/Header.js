@@ -1,6 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import "../styles/App.css"
 import { ActionButton } from "./BotaoAcao.js";
+import { rotaPrincipal } from "../globals.js";
 export function Header({ onProfileClick, currentModule="Redações" }) {
+  const navigate = useNavigate()
+
   const navButtonLayout = {
     display: "flex",
     flexDirection: "column",
@@ -24,7 +28,7 @@ export function Header({ onProfileClick, currentModule="Redações" }) {
               <span style={{ fontFamily: "'Roboto',sans-serif", fontWeight: 700, fontSize: 17, color: "var(--cor-vest)" }}>Vest</span>
             </>
           }
-          onClick={() => {}}
+          onClick={() => navigate(rotaPrincipal)}
           color="var(--fundo-logo)"
           borderRadius={20}
         />
