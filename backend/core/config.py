@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = ""
     GROQ_API_KEY: str = ""
 
+    MODEL: str
+    MAX_TOKENS: int
+    EFFORT: str
+    MONTHLY_LIMIT: int
+
     
     @field_validator("ALLOWED_ORIGINS")
     def parse_allowed_origins(cls, v: str) -> List[str]:

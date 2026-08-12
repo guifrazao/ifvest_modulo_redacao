@@ -64,7 +64,7 @@ export function EssayWritingBox({ essayText, setEssayText }) {
       setIsLoading(true)
 
       try{
-        const response = await api.post("ocr/extrair_texto/", formData);
+        const response = await api.post("ai/extrair_texto/", formData);
 
         if(response.status === 200 && response.data) {
           

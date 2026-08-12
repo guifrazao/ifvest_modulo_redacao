@@ -15,6 +15,7 @@ class CorrectionBase(SQLModel):
     c4_score: int = Field(ge=0, le=200)
     c5_score: int = Field(ge=0, le=200)
     corrected_at: datetime = Field(default_factory=datetime.now)
+    general_feedback: Optional[str] = Field(default=None)
 
 class Correction(CorrectionBase, table=True):
     __tablename__ = "corrections"
@@ -43,6 +44,7 @@ class CorrectionUpdate(CorrectionBase):
     c3_score: Optional[int] = Field(default=None, ge=0, le=200)
     c4_score: Optional[int] = Field(default=None, ge=0, le=200)
     c5_score: Optional[int] = Field(default=None, ge=0, le=200)
+    general_feedback: Optional[str] = Field(default=None)
     comment_ids: Optional[List[int]] = None
 
 try:

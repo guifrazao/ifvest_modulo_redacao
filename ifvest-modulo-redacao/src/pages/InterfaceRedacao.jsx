@@ -31,17 +31,40 @@ export default function InterfaceRedacao(){
         }
 
         try {
-            const response = await api.post("/essay/create/", {
-                submitted_text: essayText,
-                image_url: null,
-                submitted_at: new Date().toISOString(),
-                user_id: idUsuario,
-                proposta_id: Number(id),
-            });
+            if (type === "ai") {
+              const response = await api.post("/essay/create/", {
+                  submitted_text: essayText,
+                  image_url: null,
+                  submitted_at: new Date().toISOString(),
+                  user_id: idUsuario,
+                  proposta_id: Number(id),
+              });
+  
+              console.log("Redação criada:", response.data);
 
-            console.log("Redação criada:", response.data);
-            alert("Sua redação foi enviada para correção");
-            navigate(rotaArea)
+              const ai_correction = await api.post("/correction/ai/create/", {
+                essay_id: 1,
+                corrector_id: 3,
+                comment_ids: [],
+              })
+
+              alert("Sua redação foi corrigida pela IA");
+              navigate(rotaArea)
+            } else {
+              const response = await api.post("/essay/create/", {
+                  submitted_text: essayText,
+                  image_url: null,
+                  submitted_at: new Date().toISOString(),
+                  user_id: idUsuario,
+                  proposta_id: Number(id),
+              });
+  
+              console.log("Redação criada:", response.data);
+              alert("Sua redação foi enviada para correção");
+              navigate(rotaArea)
+            }
+
+
         } catch (error) {
             console.error("Erro ao criar redação:", error);
             alert("Não foi possível enviar a redação");
@@ -55,12 +78,14 @@ export default function InterfaceRedacao(){
           const proposta = response.data;
 
           setEssayTitle(proposta.title);
+          console.log(proposta.support_texts)
 
           const textos = proposta.support_texts.map((st, index) => ({
                     type:  st.type,
                     label: `TEXTO ${index + 1}`,
                     title: st.title,
                     body:  st.content,
+                    source: st.source,
                 }));
           setComponentList(textos);
           setIsLoading(false);

@@ -29,6 +29,7 @@ export default function InterfaceCriarRedacao(){
         title: data.title,
         body:  data.bodyText,
         type:  data.type === "figura" ? "image" : "text",
+        source: data.source,
         }]);
     }
 

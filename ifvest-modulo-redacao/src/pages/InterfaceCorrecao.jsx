@@ -346,6 +346,7 @@ const decrementarNota = (compId) => {
       label: `TEXTO ${index + 1}`,
       title: st.title,
       body: st.content,
+      source: st.source,
     }))
   }, [essayData?.support_texts])
 
@@ -679,6 +680,9 @@ const decrementarNota = (compId) => {
                   <span className="soma-final-valor">{notaTotal} / 1000 pts</span>
                 </div>
               </div>
+              
+              <textarea></textarea>
+
             </div>
           </div>
         </div>

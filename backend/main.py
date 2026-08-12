@@ -11,8 +11,8 @@ from routers import teste_ocr, proposta, support_text, user, essay, comment, cor
 #Necessário para realizar tarefas no start up/encerramento da execução
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_and_tables()
     #Tudo antes do yield é executado no start up
+    create_db_and_tables()
     yield
     #Tudo depois do yield é executado no encerramento
 

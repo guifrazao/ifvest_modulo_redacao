@@ -29,14 +29,20 @@ export function SubHeader({ title, onTitleChange, onBack, readOnly = true, navig
       </button>
  
       {/* Título centrado */}
-      <input
-        type="text"
-        value={title}
-        readOnly={readOnly}
-        className={readOnly ? "titulo-subheader-readonly" : "titulo-subheader"}
-        onChange={onTitleChange}
-        placeholder="Digite o título da proposta aqui..."
-      />
+      {readOnly ? (
+        <span className="titulo-subheader-readonly">
+          {title}
+        </span>
+      ) : (
+        <input
+          type="text"
+          value={title}
+          className={"titulo-subheader"}
+          onChange={onTitleChange}
+          placeholder="Digite a frase tema da proposta aqui..."
+          title={title}
+        />
+      )}
     </div>
   );
 }

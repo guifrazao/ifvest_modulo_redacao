@@ -30,6 +30,7 @@ class SupportText(SupportTextBase, table=True):
 
 class SupportTextPublic(SupportTextBase):
     id: int
+    source: str
 
 class SupportTextCreate(SupportTextBase):
     source: str

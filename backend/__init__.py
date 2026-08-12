@@ -1,1 +1,1 @@
-from ocr_groq_vlm import groq_vlm
+from backend.ai.ocr_groq_vlm import groq_vlm

@@ -1,5 +1,5 @@
 
-export function SupportTextItem({ type = "text", label, title, body}) {
+export function SupportTextItem({ type = "text", label, title, body, source}) {
   return (
     <div style={{ marginBottom: 18 }}>
       <p className="label-txt-apoio">
@@ -12,6 +12,10 @@ export function SupportTextItem({ type = "text", label, title, body}) {
 
       <p className="corpo-txt-apoio">
         {body}
+      </p>
+
+      <p className="fonte-txt-apoio">
+        Disponível em: {source}
       </p>
     
       {type === "image" && (   
