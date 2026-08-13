@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     MAX_TOKENS: int
     EFFORT: str
     MONTHLY_LIMIT: int
+    ANTHROPIC_API_KEY: str
 
     
     @field_validator("ALLOWED_ORIGINS")

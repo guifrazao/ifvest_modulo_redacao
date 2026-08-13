@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, Form, HTTPException
 from typing import List
 from sqlmodel import Session, select
 from datetime import datetime
+from core import settings
 from database import get_session
 from models import Correction, CorrectionPublic, CorrectionCreate, CorrectionUpdate, Comment, User, Essay, SupportText
 from schemas import EssayWithProposta, CorrectionNoGrades
 from ai.ai_correction import corretor, plagio
+from ai.ai_correction.corretor import ErroDeCorrecao
 
 router = APIRouter(
     prefix = "/correction",
@@ -68,7 +70,6 @@ def create_correction(
     )
 
 #TODO: CORREÇÃO OBRIGATORIAMENTE PRECISA DE UM USUÁRIO, FAZER COM QUE ESSE NAO SEJA O CASO
-#FAZER UM ENDPOINT PROPRIO PRA CORRECAO POR IA EM ARQUIVO SEPARADO (CORRECAO ESPERA NOTAS DAS COMPETENCIAS, NAO EXISTEM ANTES DA CORRECAO POR IA)
 @router.post("/ai/create/", response_model=CorrectionPublic)
 def create_ai_correction(
     *,
@@ -95,22 +96,26 @@ def create_ai_correction(
     if len(db_comments) != len(correction.comment_ids):
         raise HTTPException(status_code=404, detail="Um ou mais comentários informados não foram encontrados")
     
-    statement = select(SupportText).where(SupportText.id.in_(essay.proposta.support_texts)) #ARRUMAR
-    db_support_texts = session.exec(statement).all() 
+    db_support_texts = essay.proposta.support_texts
 
     textos_apoio_adaptados = ""
     for support_text in db_support_texts:
-        textos_apoio_adaptados += support_text.content + " "
+        if support_text.content:
+            textos_apoio_adaptados += support_text.content + " "
 
 
     retorno_plagio = plagio.detectar_copia(essay.submitted_text, textos_apoio_adaptados)
 
-    ai_correction = corretor.corrigir_redacao(
+    try:
+        ai_correction = corretor.corrigir_redacao(
             redacao=essay.submitted_text,
             titulo_tema=essay.proposta.title,
             textos_apoio=textos_apoio_adaptados,
             plagio=retorno_plagio,
-    )
+            api_key=settings.ANTHROPIC_API_KEY,
+        )
+    except ErroDeCorrecao as e:
+        raise HTTPException(status_code=e.status, detail=e.mensagem)
 
     feedback = f"""{ai_correction.competencias[0].feedback}
 
@@ -136,17 +141,22 @@ def create_ai_correction(
             corrector_id=correction.corrector_id,
             comments=db_comments,
         )
+
+    essay.status = "done"
     
     session.add(db_correction)
+    session.add(essay)
     session.commit()
     session.refresh(db_correction)
 
     return CorrectionPublic(
+        id=db_correction.id,
         c1_score=ai_correction.competencias[0].nota,
         c2_score=ai_correction.competencias[1].nota,
         c3_score=ai_correction.competencias[2].nota,
         c4_score=ai_correction.competencias[3].nota,
         c5_score=ai_correction.competencias[4].nota,
+        corrected_at=db_correction.corrected_at,
         general_feedback=feedback,
         corrector_name="IA IFVEST",
         comments=db_comments,
@@ -180,7 +190,10 @@ def update_correction(
 
         db_correction.comments = db_comments
 
+    essay.status = "done"
+
     session.add(db_correction)
+    session.add(essay)
     session.commit()
     session.refresh(db_correction)
 

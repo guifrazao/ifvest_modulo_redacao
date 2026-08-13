@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { EssayWritingBox } from "../components/AreaRedacao";
 import { ActionButton } from "../components/BotaoAcao";
 import { LoadingScreen } from "../components/TelaCarregamento.js";
-import { idUsuario, rotaArea } from "../globals.js"
+import { idUsuario, rotaArea, idIA } from "../globals.js"
 
 /* TODO: Mudar lineHeight da área de digitação, implementar orientações abaixo dos textos de apoio (redija uma redação com o tema...), dar mais destaque ao título*/
 
@@ -31,39 +31,30 @@ export default function InterfaceRedacao(){
         }
 
         try {
-            if (type === "ai") {
-              const response = await api.post("/essay/create/", {
-                  submitted_text: essayText,
-                  image_url: null,
-                  submitted_at: new Date().toISOString(),
-                  user_id: idUsuario,
-                  proposta_id: Number(id),
-              });
-  
-              console.log("Redação criada:", response.data);
+          const response = await api.post("/essay/create/", {
+              submitted_text: essayText,
+              image_url: null,
+              submitted_at: new Date().toISOString(),
+              user_id: idUsuario,
+              proposta_id: Number(id),
+          });
 
-              const ai_correction = await api.post("/correction/ai/create/", {
-                essay_id: 1,
-                corrector_id: 3,
+          console.log("Redação criada:", response.data);
+          const essayId = response.data.id;
+
+            if (type === "ai") {
+              await api.post("/correction/ai/create/", {
+                essay_id: response.data.id,
+                corrector_id: idIA,
                 comment_ids: [],
               })
 
               alert("Sua redação foi corrigida pela IA");
-              navigate(rotaArea)
             } else {
-              const response = await api.post("/essay/create/", {
-                  submitted_text: essayText,
-                  image_url: null,
-                  submitted_at: new Date().toISOString(),
-                  user_id: idUsuario,
-                  proposta_id: Number(id),
-              });
-  
-              console.log("Redação criada:", response.data);
               alert("Sua redação foi enviada para correção");
-              navigate(rotaArea)
             }
-
+            
+            navigate(rotaArea)
 
         } catch (error) {
             console.error("Erro ao criar redação:", error);

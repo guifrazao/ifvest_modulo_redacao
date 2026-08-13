@@ -3,3 +3,4 @@ export const rotaPrincipal = tipoUsuario === "professor" ? "/professor" : "/stud
 export const rotaArea = tipoUsuario === "professor" ? "/area_corretor" : "/area_aluno"
 export const idUsuario = 1;
 export const idCorretor = 2;
+export const idIA = 3;
