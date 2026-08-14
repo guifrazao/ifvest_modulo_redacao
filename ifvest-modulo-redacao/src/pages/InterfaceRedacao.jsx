@@ -20,6 +20,7 @@ export default function InterfaceRedacao(){
     const [essayTitle, setEssayTitle] = useState("");
     const [essayText, setEssayText] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [loadingMessage, setLoadingMessage] = useState("Carregando proposta de redação...")
 
     const navigate = useNavigate();
     const { id } = useParams();
@@ -29,6 +30,9 @@ export default function InterfaceRedacao(){
             alert("Escreva ou envie sua redação antes de enviar para correção");
             return;
         }
+        
+        setLoadingMessage(type === "ai" ? "A IA está corrigindo sua redação..." : "Enviando redação...")
+        setIsLoading(true)
 
         try {
           const response = await api.post("/essay/create/", {
@@ -43,13 +47,16 @@ export default function InterfaceRedacao(){
           const essayId = response.data.id;
 
             if (type === "ai") {
-              await api.post("/correction/ai/create/", {
+              const ai_response = await api.post("/correction/ai/create/", {
                 essay_id: response.data.id,
                 corrector_id: idIA,
                 comment_ids: [],
               })
 
-              alert("Sua redação foi corrigida pela IA");
+              if(ai_response.data){
+                alert("Sua redação foi corrigida pela IA");
+              }
+
             } else {
               alert("Sua redação foi enviada para correção");
             }
@@ -59,6 +66,8 @@ export default function InterfaceRedacao(){
         } catch (error) {
             console.error("Erro ao criar redação:", error);
             alert("Não foi possível enviar a redação");
+        } finally {
+          setIsLoading(false)
         }
     }
 
@@ -88,7 +97,7 @@ export default function InterfaceRedacao(){
       getProposta();
     }, [id])
 
-    if (isLoading) return <LoadingScreen message="Carregando proposta de redação..."/>
+    if (isLoading) return <LoadingScreen message={loadingMessage}/>
 
     return (
 

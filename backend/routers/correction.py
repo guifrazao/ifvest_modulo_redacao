@@ -103,6 +103,7 @@ def create_ai_correction(
         if support_text.content:
             textos_apoio_adaptados += support_text.content + " "
 
+    textos_apoio_adaptados = textos_apoio_adaptados.strip() or None
 
     retorno_plagio = plagio.detectar_copia(essay.submitted_text, textos_apoio_adaptados)
 
@@ -117,18 +118,24 @@ def create_ai_correction(
     except ErroDeCorrecao as e:
         raise HTTPException(status_code=e.status, detail=e.mensagem)
 
-    feedback = f"""{ai_correction.competencias[0].feedback}
+    feedback = f"""
+COMPETÊNCIA 1:
+{ai_correction.competencias[0].feedback}
 
-                      {ai_correction.competencias[1].feedback}
+COMPETÊNCIA 2:
+{ai_correction.competencias[1].feedback}
 
-                      {ai_correction.competencias[2].feedback}
+COMPETÊNCIA 3:
+{ai_correction.competencias[2].feedback}
 
-                      {ai_correction.competencias[3].feedback}
+COMPETÊNCIA 4:
+{ai_correction.competencias[3].feedback}
 
-                      {ai_correction.competencias[4].feedback}
+COMPETÊNCIA 5:
+{ai_correction.competencias[4].feedback}
 
-                      {ai_correction.melhorias}
-    """
+COMENTÁRIOS GERAIS:
+{ai_correction.melhorias}"""
 
     db_correction = Correction(
             c1_score=ai_correction.competencias[0].nota,

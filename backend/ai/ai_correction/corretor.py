@@ -119,7 +119,7 @@ def corrigir_redacao(
     except anthropic.APIStatusError as erro:
         # Cobre 400 (ex.: saldo insuficiente), 404 e 5xx do provedor.
         raise ErroDeCorrecao(
-            f"A API recusou a requisição (HTTP {erro.status_code}).", status=502
+            f"A API recusou a requisição (HTTP {erro.status_code}), mensagem {erro.message}.", status=502
         ) from erro
     except anthropic.APIConnectionError as erro:
         raise ErroDeCorrecao(

@@ -59,6 +59,7 @@ def get_essay_by_id(
             c5_score=essay.correction.c5_score,
             corrected_at=essay.correction.corrected_at,
             corrector_name=essay.correction.corrector.name,
+            general_feedback=essay.correction.general_feedback,
             comments=essay.correction.comments,
         )
 
@@ -81,6 +82,27 @@ def get_pending_essays(
     session: Session = Depends(get_session)
 ):
     statement = select(Essay).where(Essay.status != "done")
+    essays = session.exec(statement).all()
+
+    result = []
+    for essay in essays:
+        result.append(EssayWithProposta(
+            id=essay.id,
+            submitted_text=essay.submitted_text,
+            image_url=essay.image_url,
+            submitted_at=essay.submitted_at,
+            status=essay.status,
+            title=essay.proposta.title,
+        ))
+
+    return result
+
+@router.get("/corrected/", response_model=List[EssayWithProposta])
+def get_corrected_essays(
+    *,
+    session: Session = Depends(get_session)
+):
+    statement = select(Essay).where(Essay.status == "done")
     essays = session.exec(statement).all()
 
     result = []

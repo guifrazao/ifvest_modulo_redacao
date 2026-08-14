@@ -11,21 +11,28 @@ import { LoadingScreen } from "../components/TelaCarregamento.js";
 
 export default function InterfaceAreaCorretor() {
   const [pendingEssays, setPendingEssays] = useState([]);
+  const [correctedEssays, setCorrectedEssays] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchPendingEssays() {
+    async function fetchEssays() {
       try {
-        const response = await api.get("/essay/pending/");
-        setPendingEssays(response.data);
+        // Busca redações pendentes e corrigidas paralelamente
+        const [pendingRes, correctedRes] = await Promise.all([
+          api.get("/essay/pending/"),
+          api.get("/essay/corrected/") // Nova rota configurada abaixo
+        ]);
+        
+        setPendingEssays(pendingRes.data);
+        setCorrectedEssays(correctedRes.data);
       } catch (error) {
-        console.error("Erro ao carregar redações aguardando correção:", error);
+        console.error("Erro ao carregar redações:", error);
       } finally {
         setIsLoading(false);
       }
     }
-    fetchPendingEssays();
+    fetchEssays();
   }, []);
 
   const handleCardClick = (id) => {
@@ -37,7 +44,7 @@ export default function InterfaceAreaCorretor() {
     return new Date(isoString).toLocaleDateString("pt-BR");
   }
 
-  if (isLoading) return <LoadingScreen message="Carregando redações para correção..." />;
+  if (isLoading) return <LoadingScreen message="Carregando redações..." />;
 
   return (
     <div style={{
@@ -84,6 +91,7 @@ export default function InterfaceAreaCorretor() {
               pendingEssays.map(essay => (
                 <CorrectionTopicCard 
                   key={essay.id}
+                  id={essay.id}
                   title={essay.title}
                   done={false}
                   submissionDate={formatDate(essay.submitted_at)}
@@ -96,25 +104,28 @@ export default function InterfaceAreaCorretor() {
           </div>
         </section>
 
-        {/* Redações Corrigidas por Mim (Mantenha estático ou integre futuramente com as correções salvas) */}
+        {/* Redações Corrigidas por Mim */}
         <section style={{ marginBottom: "40px" }}>
-          <h2 style={{
-            fontSize: "12px",
-            fontWeight: "600",
-            color: "#757575",
-            margin: "0 0 8px 0",
-            fontFamily: "'Roboto', sans-serif"
-          }}>
+          <h2 style={{ fontSize: "12px", fontWeight: "600", color: "#757575", margin: "0 0 8px 0", fontFamily: "'Roboto', sans-serif" }}>
             Redações corrigidas por mim
           </h2>
           <hr style={{ border: "none", borderTop: "1px solid #e8e8e8", marginBottom: "16px" }} />
           
-          <div style={{
-            display: "flex",
-            gap: "20px",
-            flexWrap: "wrap"
-          }}>
-            {/* Mantido temporariamente conforme seu código original */}
+          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            {correctedEssays.length > 0 ? (
+              correctedEssays.map(essay => (
+                <CorrectionTopicCard 
+                  key={essay.id}
+                  id={essay.id}
+                  title={essay.title}
+                  status="done"
+                  submissionDate={formatDate(essay.submitted_at)}
+                  onClick={() => handleCardClick(essay.id)}
+                />
+              ))
+            ) : (
+              <p style={{ fontSize: 14, color: "#888" }}>Nenhuma redação já corrigida por você.</p>
+            )}
           </div>
         </section>
 

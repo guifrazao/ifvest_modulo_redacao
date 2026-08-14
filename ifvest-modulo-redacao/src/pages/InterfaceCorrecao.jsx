@@ -12,11 +12,11 @@ import { SupportTextsContainer } from "../components/ContainerTextosApoio";
 import { LoadingScreen } from "../components/TelaCarregamento";
 
 const competenciasDisponiveis = [
-  { id: "c1", label: "Competência 1", cor: "#fbc02d" },
-  { id: "c2", label: "Competência 2", cor: "#82f436" },
-  { id: "c3", label: "Competência 3", cor: "#e91e63" },
-  { id: "c4", label: "Competência 4", cor: "#2196f3" },
-  { id: "c5", label: "Competência 5", cor: "#9c27b0" },
+  { id: "c1", label: "Competência 1", cor: "#fbf72d" }, // Amarelo
+  { id: "c2", label: "Competência 2", cor: "#ffba52" }, // Laranja
+  { id: "c3", label: "Competência 3", cor: "#2196f3" }, // Azul
+  { id: "c4", label: "Competência 4", cor: "#66ad69" }, // Verde
+  { id: "c5", label: "Competência 5", cor: "rgb(250, 133, 225)" }, // Rosa
 ];
 
 const dadosCompetenciasEnem = [
@@ -209,6 +209,7 @@ export default function InterfaceCorrecao({ readOnly = false }) {
 
   const [notasCompetencias, setNotasCompetencias] = useState({ c1: 0, c2: 0, c3: 0, c4: 0, c5: 0 });
   const [comentarios, setComentarios] = useState([]);
+  const [generalFeedback, setGeneralFeedback] = useState("");
 
   const [botaoFlutuante, setBotaoFlutuante] = useState({ visivel: false, x: 0, y: 0, startOffset: null, endOffset: null });
   const [hoveredComment, setHoveredComment] = useState(null);
@@ -254,6 +255,7 @@ const decrementarNota = (compId) => {
             c5: data.correction.c5_score,
           });
           setCorrectorName(data.correction.corrector_name);
+          setGeneralFeedback(data.correction.general_feedback ?? "")
 
           const comentariosCarregados = data.correction.comments.map(c => {
             const compInfo = competenciasDisponiveis.find(cd => cd.id === c.competence);
@@ -313,6 +315,7 @@ const decrementarNota = (compId) => {
         c3_score: notasCompetencias.c3,
         c4_score: notasCompetencias.c4,
         c5_score: notasCompetencias.c5,
+        general_feedback: generalFeedback,
         comment_ids,
       }
 
@@ -681,7 +684,18 @@ const decrementarNota = (compId) => {
                 </div>
               </div>
               
-              <textarea></textarea>
+              <div className="feedback-geral-card">
+                <h3 className="feedback-geral-titulo">
+                  {correctorName === "IA IFVest" ? "Feedback da IA" : "Comentário geral"}
+                </h3>
+                <textarea
+                  className="feedback-geral-textarea"
+                  value={generalFeedback}
+                  onChange={(e) => !readOnly && setGeneralFeedback(e.target.value)}
+                  readOnly={readOnly}
+                  placeholder={readOnly ? "" : "Escreva aqui um comentário geral sobre a redação..."}
+                />
+              </div>
 
             </div>
           </div>
