@@ -4,12 +4,12 @@ import { ActionButton } from "./BotaoAcao";
 import { UploadForm } from "./FormUpload";
 import { SupportTextItem } from "./TextoApoio";
 
-export function SuppTextCreationArea({ onCancel, onInsert }) {
+export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
   // Estados principais do formulário
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("texto");
-  const [bodyText, setBodyText] = useState("");
-  const [source, setSource] = useState("");
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [type, setType] = useState(initialData?.type === "image" ? "figura" : "texto");
+  const [bodyText, setBodyText] = useState(initialData?.body || "");
+  const [source, setSource] = useState(initialData?.source || "");
   
   // Estados do componente de upload
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -132,7 +132,7 @@ export function SuppTextCreationArea({ onCancel, onInsert }) {
       {/* Botões criar e cancelar */}
       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
         <ActionButton 
-          text="Inserir texto de apoio"
+          text={initialData ? "Salvar alterações" : "Inserir texto de apoio"}
           color="#2d6a4f"               
           textColor="#ffffff"
           borderRadius={20}

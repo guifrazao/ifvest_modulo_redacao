@@ -1032,6 +1032,137 @@
       flex-shrink: 0;
     }
 
+  /* INTERFACE MINHAS PROPOSTAS */
+    .minhas-propostas-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #fff;
+      box-sizing: border-box;
+    }
+
+    .minhas-propostas-main {
+      flex: 1;
+      padding: 24px 30px;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .minhas-propostas-section {
+      margin-bottom: 40px;
+    }
+
+    .minhas-propostas-titulo {
+      font-size: 12px;
+      font-weight: 600;
+      color: #888888;
+      margin: 0 0 8px 0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .minhas-propostas-linha {
+      border: none;
+      border-top: 1px solid #e8e8e8;
+      margin-bottom: 16px;
+    }
+
+    .minhas-propostas-grid {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .minhas-propostas-vazio {
+      font-size: 14px;
+      color: #888;
+    }
+
+  /* CARD PROPOSTA */
+    .card-proposta {
+      background: var(--fundo-nao-feito);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      cursor: pointer;
+      min-height: 88px;
+      gap: 16px;
+      outline: none;
+      flex: 1 1 calc(50% - 12px);
+      min-width: 290px;
+      box-sizing: border-box;
+    }
+
+    .card-proposta:hover {
+      opacity: 0.8;
+    }
+
+    .card-proposta-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .card-proposta-titulo {
+      font-size: 14px;
+      font-weight: 700;
+      color: #757575;
+      line-height: 1.4;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .card-proposta-detalhes {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 11px;
+      color: #757575;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .card-proposta-detalhes span {
+      color: #757575;
+    }
+
+    .card-proposta-detalhes .destaque {
+      font-weight: 500;
+    }
+
+    .card-proposta-tags {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .card-proposta-tag-item {
+      background-color: #dcdcdc;
+      color: #333;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .btn-card-proposta {
+      background: var(--btn-nao-feito);
+      width: 44px; 
+      height: 44px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
 /* MISCELANEO */
 @keyframes spinLoading {
   0% {

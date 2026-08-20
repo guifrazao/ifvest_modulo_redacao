@@ -90,6 +90,12 @@ export default function InterfaceProf() {
             </span>
  
             <div style={{display: "flex", gap: "4px"}}>
+                <ActionButton text="Minhas Propostas" 
+                  textColor={T.textoBtnProf} 
+                  color={T.btnAreaProf} 
+                  borderRadius={20}
+                  onClick={() => navigate("/minhas_propostas")}
+                />
               <ActionButton text="Minhas redações" textColor={T.textoBtnAluno} color={T.btnAreaAluno} borderRadius={20} onClick={() => navigate("/area_corretor")}/>
               <ActionButton text="Criar nova proposta" 
                 textColor={T.textoBtnProf} 

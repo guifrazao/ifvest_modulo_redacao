@@ -18,7 +18,8 @@ class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     
     proposta_links: List["Essay"] = Relationship(back_populates="user")
-    corrections_made: List["Correction"] = Relationship (back_populates="corrector")
+    corrections_made: List["Correction"] = Relationship(back_populates="corrector")
+    propostas_created: List["Proposta"] = Relationship(back_populates="creator")
 
 class UserPublic(UserBase):
     id: int

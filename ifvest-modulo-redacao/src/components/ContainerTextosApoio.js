@@ -2,8 +2,7 @@ import T from "../styles/tokens"
 import { SupportTextItem } from "./TextoApoio";
 import { useState } from "react";
 
-
-export function SupportTextsContainer({ items = [], children }) {
+export function SupportTextsContainer({ items = [], editable = false, onEdit, onDelete, children }) {
  
   return (
     //Container textos de apoio
@@ -22,7 +21,13 @@ export function SupportTextsContainer({ items = [], children }) {
 
         <div style={{ width: "100%", textAlign: "left" }}>
             {items.map((item, idx) => (
-                <SupportTextItem key={item.id ?? idx} {...item}/>
+                <SupportTextItem 
+                    key={item.id ?? idx} 
+                    {...item}
+                    editable={editable}
+                    onEdit={() => onEdit && onEdit(item.id)}
+                    onDelete={() => onDelete && onDelete(item.id)}
+                />
             ))}
         </div>
 

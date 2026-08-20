@@ -8,6 +8,8 @@ import InterfaceCriarRedacao from './pages/InterfaceCriarRedacao';
 import InterfaceCorrecao from './pages/InterfaceCorrecao';
 import InterfaceAreaAluno from './pages/InterfaceAreaAluno';
 import InterfaceAreaCorretor from './pages/InterfaceAreaCorretor';
+import InterfaceMinhasPropostas from './pages/InterfaceMinhasPropostas.jsx';
+import InterfaceEditarProposta from './pages/InterfaceEditarProposta.jsx';
 
 
 
@@ -21,11 +23,13 @@ function App() {
           <Route path="/professor" element={<InterfaceProf/>}/>
           <Route path="/proposta/:id" element={<InterfaceRedacao/>}/>
           <Route path="/criar_redacao" element={<InterfaceCriarRedacao/>}/>
+          <Route path="/proposta/edit/:id" element={<InterfaceEditarProposta/>}/>
           <Route path="/correcao/:id" element={<InterfaceCorrecao readOnly={true}/>}/>
           <Route path="/corrigir/:id" element={<InterfaceCorrecao readOnly={false}/>}/>
           <Route path="/area" element={<Navigate to={rotaArea} replace />}/>
           <Route path="/area_aluno" element={<InterfaceAreaAluno/>}/>
           <Route path="/area_corretor" element={<InterfaceAreaCorretor/>}/>
+          <Route path="/minhas_propostas" element={<InterfaceMinhasPropostas/>}/>
         </Routes>
       </div>
     </Router>

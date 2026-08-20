@@ -1,5 +1,6 @@
 import T from "../styles/tokens"
 import api from "../api";
+import { idCorretor } from "../globals.js";
 import { rotaPrincipal } from "../globals.js"
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
@@ -68,6 +69,7 @@ export default function InterfaceCriarRedacao(){
                 created_at: new Date().toISOString(),
                 support_text_ids: supportTextIds,
                 tags: tags,
+                creator_id: idCorretor,
             };
 
             const response = await api.post("/proposta/create/", payload)

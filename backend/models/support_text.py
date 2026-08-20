@@ -37,7 +37,9 @@ class SupportTextCreate(SupportTextBase):
 
 class SupportTextUpdate(SupportTextBase):
     title: Optional[str] = None
+    type: Optional[str] = None
     content: Optional[str] = None
+    image_url: Optional[str] = None
     source: Optional[str] = None
 
 #Necessário para que a documentação automática funcione

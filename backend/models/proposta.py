@@ -5,6 +5,7 @@ from sqlmodel import Field, SQLModel, Relationship, JSON
 if TYPE_CHECKING:
     from .support_text import SupportText, SupportTextPublic
     from .essay import Essay
+    from .user import User
 
 class PropostaBase(SQLModel): #Será usada na criação das correções (área do aluno/corretor)
     title: str = Field(index=True)
@@ -19,6 +20,9 @@ class Proposta(PropostaBase, table=True):
 
     user_links: List["Essay"] = Relationship(back_populates="proposta")
 
+    creator_id: Optional[int] = Field(default=None, foreign_key="users.id")
+    creator: Optional["User"] = Relationship(back_populates="propostas_created")
+
 class PropostaPublic(PropostaBase): #Garante que o id nunca será None quando for solicitado (Consumidores da API não precisam verificar se o id é None)
     id_proposta: int
 
@@ -29,6 +33,7 @@ class PropostaDetail(PropostaPublic):
 class PropostaCreate(PropostaBase):
     support_text_ids: List[int]
     tags: List[str]
+    creator_id: int
 
 class PropostaUpdate(PropostaBase):
     title: Optional[str] = None
@@ -40,6 +45,7 @@ class PropostaUpdate(PropostaBase):
 try:
     from .support_text import SupportText, SupportTextPublic
     from .essay import Essay
+    from .user import User
     Proposta.model_rebuild()
     PropostaDetail.model_rebuild()
     PropostaCreate.model_rebuild()
