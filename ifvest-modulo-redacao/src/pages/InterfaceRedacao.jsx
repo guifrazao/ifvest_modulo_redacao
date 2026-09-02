@@ -10,7 +10,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { EssayWritingBox } from "../components/AreaRedacao";
 import { ActionButton } from "../components/BotaoAcao";
 import { LoadingScreen } from "../components/TelaCarregamento.js";
-import { idUsuario, rotaArea, idIA } from "../globals.js"
+import { idUsuario, idCorretor, rotaArea, idIA } from "../globals.js"
+import { resolveStaticUrl } from "../utils/media.js"
 
 /* TODO: Mudar lineHeight da área de digitação, implementar orientações abaixo dos textos de apoio (redija uma redação com o tema...), dar mais destaque ao título*/
 
@@ -39,7 +40,7 @@ export default function InterfaceRedacao(){
               submitted_text: essayText,
               image_url: null,
               submitted_at: new Date().toISOString(),
-              user_id: idUsuario,
+              user_id: idCorretor,
               proposta_id: Number(id),
           });
 
@@ -78,7 +79,6 @@ export default function InterfaceRedacao(){
           const proposta = response.data;
 
           setEssayTitle(proposta.title);
-          console.log(proposta.support_texts)
 
           const textos = proposta.support_texts.map((st, index) => ({
                     type:  st.type,
@@ -86,6 +86,7 @@ export default function InterfaceRedacao(){
                     title: st.title,
                     body:  st.content,
                     source: st.source,
+                    imageUrl: st.type === "image" ? resolveStaticUrl(st.image_url) : null,
                 }));
           setComponentList(textos);
           setIsLoading(false);

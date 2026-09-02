@@ -1,5 +1,6 @@
 import T from "../styles/tokens"
 import api from "../api";
+import { resolveStaticUrl } from "../utils/media.js";
 import { idCorretor } from "../globals.js";
 import { rotaPrincipal } from "../globals.js"
 import { Header } from "../components/Header"
@@ -13,7 +14,6 @@ import { SupportTextItem } from "../components/TextoApoio";
 import { SuppTextCreationArea } from "../components/FormCriacaoTxtApoio";
 import { TagsInput } from "../components/TagsInput";
 
-/* TODO: ADICIONAR BOTÕES EDITAR/REMOVER E MOVER AS TAGS PRA FORA DA CRIAÇÃO DE TEXTO DE APOIO */
 export default function InterfaceCriarRedacao(){
     const [isCreating, setIsCreating] = useState(false);
     const [componentList, setComponentList] = useState([])
@@ -23,14 +23,15 @@ export default function InterfaceCriarRedacao(){
 
     const navigate = useNavigate();
 
-    const addComponent = (data) => {
+    const addComponent = (data, serverImageURL = null) => {
         setComponentList([...componentList, {
-        id:    Date.now(),
-        label: `TEXTO ${componentList.length + 1}`,
-        title: data.title,
-        body:  data.bodyText,
-        type:  data.type === "figura" ? "image" : "text",
-        source: data.source,
+            id:    Date.now(),
+            label: `TEXTO ${componentList.length + 1}`,
+            title: data.title,
+            body:  data.bodyText,
+            type:  data.type === "figura" ? "image" : "text",
+            source: data.source,
+            imageUrl: data.type === "figura" ? resolveStaticUrl(serverImageURL) : null,
         }]);
     }
 
@@ -53,7 +54,7 @@ export default function InterfaceCriarRedacao(){
                 }
             })
 
-            addComponent(data);
+            addComponent(data, response.data.image_url);
 
             setSupportTextIds((prev) => [...prev, response.data.id])
 

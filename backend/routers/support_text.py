@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Form, HTTPException
+import os
+import uuid
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, File
 from sqlmodel import Session
 from database import get_session
 from models import SupportText, SupportTextPublic, SupportTextUpdate
@@ -8,6 +10,9 @@ router = APIRouter(
     tags=["support_text"]
 )
 
+UPLOAD_DIR = "static/uploads/support_texts"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 @router.post("/create_text/", response_model=SupportTextPublic)
 def create_support_text_text(
     *, 
@@ -15,10 +20,25 @@ def create_support_text_text(
     title: str = Form(...),
     type: str = Form(...),
     content: str = Form(None),
-    image_url: str = Form(None),
     source: str = Form(...),
     id_proposta: int = Form(None),
+    file: UploadFile = File(None),
 ):
+    image_url = None
+
+    if type == "image":
+        if not file:
+            raise HTTPException(status_code=400, detail="É necessário enviar um arquivo de imagem para textos de apoio do tipo figura")
+
+        extensao = os.path.splitext(file.filename)[1]
+        nome_arquivo = f"{uuid.uuid4().hex}{extensao}"
+        caminho_completo = os.path.join(UPLOAD_DIR, nome_arquivo)
+
+        with open(caminho_completo, "wb") as buffer:
+            buffer.write(file.file.read())
+
+        image_url = f"/static/support_texts/{nome_arquivo}"
+    
     db_support_text = SupportText(
         title=title,
         type=type,

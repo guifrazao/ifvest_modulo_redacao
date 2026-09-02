@@ -11,6 +11,7 @@ import { ActionButton } from "../components/BotaoAcao";
 import { SuppTextCreationArea } from "../components/FormCriacaoTxtApoio";
 import { TagsInput } from "../components/TagsInput";
 import { LoadingScreen } from "../components/TelaCarregamento.js";
+import { resolveStaticUrl } from "../utils/media.js";
 
 export default function InterfaceEditarProposta(){
     const { id } = useParams();
@@ -40,6 +41,7 @@ export default function InterfaceEditarProposta(){
                         body: st.content,
                         type: st.type,
                         source: st.source,
+                        imageUrl: st.type === "image" ? resolveStaticUrl(st.image_url) : null,
                     }))
                 );
 
@@ -103,6 +105,7 @@ export default function InterfaceEditarProposta(){
                 body: data.bodyText,
                 type: data.type === "figura" ? "image" : "text",
                 source: data.source,
+                imageUrl: data.type === "figura" ? resolveStaticUrl(response.data.image_url) : null,
             }]);
 
         } catch (error) {

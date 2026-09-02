@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import { useNavigate, useNavigation } from 'react-router-dom';
 import "../styles/App.css"
 import api from "../api.js"
+import { idUsuario } from '../globals.js';
 import { Header } from '../components/Header.js';
 import { SubHeader } from '../components/SubHeader.js';
 import { TopicSearchBar } from '../components/BarraPesquisa.js';
@@ -18,6 +19,9 @@ export default function InterfacePrincipal() {
   const [page,  setPage]  = useState(1);
   const [query, setQuery] = useState("");
 
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [sortOrder, setSortOrder] = useState("recent");
+
   const [topics, setTopics] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -27,12 +31,14 @@ export default function InterfacePrincipal() {
   useEffect(() => {
     async function getEssays() {
       try{
-        const response = await api.get("/proposta/");
+        const response = await api.get(`/proposta/?user_id=${idUsuario}`);
       
         const propostas = response.data.map(proposta => ({
           id_proposta: proposta.id_proposta,
           title: proposta.title,
-          done: false
+          created_at: proposta.created_at,
+          tags: proposta.tags,
+          done: proposta.done
         }));
     
         setTopics(propostas)
@@ -47,9 +53,21 @@ export default function InterfacePrincipal() {
 
   }, []);
 
-  const filtered = topics.filter(t =>
-    t.title ? t.title.toLowerCase().includes(query.toLowerCase()) : false
-  );
+  const availableTags = useMemo(() => {
+    const todas = topics.flatMap(t => t.tags ?? []);
+    return [...new Set(todas)].sort();
+  }, [topics]);
+
+  const filtered = useMemo(() => {
+    return topics
+      .filter(t => t.title ? t.title.toLowerCase().includes(query.toLowerCase()) : false)
+      .filter(t => selectedTags.length === 0 || (t.tags ?? []).some(tag => selectedTags.includes(tag)))
+      .sort((a, b) => {
+        const dataA = new Date(a.created_at);
+        const dataB = new Date(b.created_at);
+        return sortOrder === "recent" ? dataB - dataA : dataA - dataB;
+    });
+  }, [topics, query, selectedTags, sortOrder]);
  
   if (isLoading) return <LoadingScreen message="Carregando propostas de redação..."/>
 
@@ -93,7 +111,16 @@ export default function InterfacePrincipal() {
           </div>
  
           {/* Barra de pesquisa */}
-          <TopicSearchBar placeholder={"Pesquisar temas de redação..."} onChange={e => setQuery(e.target.value)}/>
+         <TopicSearchBar
+            placeholder={"Pesquisar temas de redação..."}
+            query={query}
+            onChange={e => setQuery(e.target.value)}
+            availableTags={availableTags}
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+            sortOrder={sortOrder}
+            onSortChange={setSortOrder}
+          />
  
           {/* Lista temas */}
           <div className="row" style={{ margin: "0 -8px" }}>

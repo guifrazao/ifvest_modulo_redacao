@@ -290,6 +290,11 @@
     }
 
 /* PÁGINA PRINCIPAL*/
+    .barra-pesquisa-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
     .barra-pesquisa {
       background: var(--fundo-barra-pesq);
       border: 1px solid var(--borda-barra-pesq);
@@ -305,6 +310,95 @@
       font-size: 13px;
       color: #757575;
       background: transparent;
+    }
+
+    .btn-filtro {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 2px;
+      display: flex;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-filtro:hover {
+      background: #f0f0f0;
+    }
+
+    .btn-filtro-ativo {
+      background: #e8f3ec;
+    }
+
+    .painel-filtro {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 260px;
+      background: #ffffff;
+      border: 1px solid #dcdcdc;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .filtro-secao {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filtro-secao-titulo {
+      margin: 0 0 2px 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: #2d6a4f;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filtro-radio-item,
+    .filtro-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .filtro-radio-item input,
+    .filtro-checkbox-item input {
+      accent-color: #2d6a4f;
+      cursor: pointer;
+    }
+
+    .filtro-tags-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .filtro-btn-limpar {
+      align-self: flex-start;
+      background: none;
+      border: none;
+      color: #dc3545;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .filtro-btn-limpar:hover {
+      text-decoration: underline;
     }
 
     .card-redacao {
@@ -384,6 +478,24 @@
     .fonte-txt-apoio {
       font-size: 10px;
       color: "#333";
+    }
+
+    .imagem-txt-apoio {
+      width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-top: 6px;
+      border: 1px solid #dcdcdc;
+      background: #f9f9f9;
+      display: block;
+    }
+
+    .imagem-txt-apoio-indisponivel {
+      font-size: 12px;
+      color: #999;
+      font-style: italic;
+      margin-top: 6px;
     }
 
     .abas-area-redacao {

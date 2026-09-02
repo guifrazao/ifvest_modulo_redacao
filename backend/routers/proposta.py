@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, Form, HTTPException
-from typing import List
+from typing import List, Optional
 from sqlmodel import Session, select
 from datetime import datetime
 from database import get_session
 from models import Proposta, PropostaCreate, PropostaPublic, PropostaDetail, PropostaUpdate, SupportText
+from schemas import PropostaListItem
 
 router = APIRouter(
     prefix="/proposta",
@@ -31,14 +32,32 @@ def create_proposta(
     session.refresh(db_proposta)
     return db_proposta
 
-@router.get("/")
+@router.get("/", response_model=List[PropostaListItem])
 def get_todas_propostas(
     session: Session = Depends(get_session),
+    user_id: Optional[int] = None,
 ):
     statement = select(Proposta)
-    results = session.exec(statement)
-    propostas = results.all()
-    return propostas
+    propostas = session.exec(statement).all()
+
+    result = []
+
+    for proposta in propostas:
+        status = "not_done"
+        if user_id is not None:
+            essay = next((e for e in proposta.user_links if e.user_id == user_id), None)
+            if essay is not None:
+                status = essay.status
+
+        result.append(PropostaListItem(
+            id_proposta=proposta.id_proposta,
+            title=proposta.title,
+            created_at=proposta.created_at,
+            tags=proposta.tags,
+            status=status,        
+        ))
+
+    return result
 
 @router.get("/{id_proposta}/", response_model=PropostaDetail)
 def get_proposta(

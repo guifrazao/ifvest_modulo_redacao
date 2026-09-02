@@ -21,14 +21,18 @@ async def upload_redacao(file: UploadFile = File(...)):
     with open(caminho_temporario_imagem, "wb") as arquivo_local:
         arquivo_local.write(conteudo_binario)
 
-    teste_groq = groq_vlm.extract_image_file(caminho_temporario_imagem)
+    teste_groq: str = groq_vlm.extract_image_file(caminho_temporario_imagem)
 
     if os.path.exists(caminho_temporario_imagem):
         os.remove(caminho_temporario_imagem)
 
+    texto_extraido = ""
+    resultado_groq = teste_groq.split("\n")
 
+    for line in resultado_groq:
+        texto_extraido += line + " " #RETORNO NÃO SEPARA AS LINHAS CORRETAMENTE
 
-    return GroqAIResponse(texto_extraido=teste_groq.replace("\n", " "))
+    return GroqAIResponse(texto_extraido=texto_extraido)
 
 # @router.post("/ai_correction", response_model=CorrecaoIA)
 # def ai_correct(

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api.js";
-import T from "../styles/tokens";
+import { resolveStaticUrl } from "../utils/media.js";
 import { idCorretor } from "../globals.js";
 import { Header } from "../components/Header";
 import { SubHeader } from "../components/SubHeader";
@@ -350,6 +350,7 @@ const decrementarNota = (compId) => {
       title: st.title,
       body: st.content,
       source: st.source,
+      imageUrl: st.type === "image" ? resolveStaticUrl(st.image_url) : null,
     }))
   }, [essayData?.support_texts])
 

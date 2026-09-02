@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import T from "../styles/tokens.js";
 import api from "../api.js"
+import { idCorretor } from '../globals.js'; //REMOVER ISSO E O RESTO DOS USUARIOS FALSOS DEPOIS QUANDO INTEGRAR COM LOGIN
 import { Header } from '../components/Header.js';
 import { SubHeader } from '../components/SubHeader.js';
 import { EssayTopicCard } from '../components/CardRedacao.js';
 import { PaginationBar } from '../components/Paginacao.js';
 import { Footer } from '../components/Footer.js';
+import { TopicSearchBar } from '../components/BarraPesquisa.js';
 import { ActionButton } from '../components/BotaoAcao.js';
 import { LoadingScreen } from '../components/TelaCarregamento.js';
 
@@ -16,6 +18,9 @@ import { LoadingScreen } from '../components/TelaCarregamento.js';
 export default function InterfaceProf() {
   const [page,  setPage]  = useState(1);
   const [query, setQuery] = useState("");
+
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [sortOrder, setSortOrder] = useState("recent");
   
   const [topics, setTopics] = useState([]);
 
@@ -26,15 +31,16 @@ export default function InterfaceProf() {
   useEffect(() => {
     async function getEssays() {
       try{
-        const response = await api.get("/proposta/");
+        const response = await api.get(`/proposta/?user_id=${idCorretor}`);
       
         const propostas = response.data.map(proposta => ({
           id_proposta: proposta.id_proposta,
           title: proposta.title,
-          done: false
+          created_at: proposta.created_at,
+          tags: proposta.tags,
+          status: proposta.status,
         }));
     
-        console.log(propostas)
         setTopics(propostas)
         setIsLoading(false);
       }catch (error){
@@ -47,9 +53,21 @@ export default function InterfaceProf() {
 
   }, []);
   
-  const filtered = topics.filter(t =>
-    t.title.toLowerCase().includes(query.toLowerCase())
-  );
+  const availableTags = useMemo(() => {
+    const todas = topics.flatMap(t => t.tags ?? []);
+    return [...new Set(todas)].sort();
+  }, [topics]);
+
+  const filtered = useMemo(() => {
+    return topics
+      .filter(t => t.title ? t.title.toLowerCase().includes(query.toLowerCase()) : false)
+      .filter(t => selectedTags.length === 0 || (t.tags ?? []).some(tag => selectedTags.includes(tag)))
+      .sort((a, b) => {
+        const dataA = new Date(a.created_at);
+        const dataB = new Date(b.created_at);
+        return sortOrder === "recent" ? dataB - dataA : dataA - dataB;
+      });
+  }, [topics, query, selectedTags, sortOrder]);
  
   if (isLoading) return <LoadingScreen message="Carregando propostas de redação..."/>
 
@@ -107,47 +125,16 @@ export default function InterfaceProf() {
           </div>
  
           {/* Barra de pesquisa */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            background: "#f0f0f0",
-            border: `1px solid ${T.bordaBarraPesq}`,
-            borderRadius: 6,
-            padding: "0 10px",
-            height: 40,
-            marginBottom: 12,
-          }}>
-            <input
-              type="text"
-              placeholder="Pesquisar temas de redação..."
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              style={{
-                flex: 1,
-                border: "none",
-                outline: "none",
-                fontSize: 13,
-                color: "#555",
-                background: "transparent",
-                fontFamily: "'Roboto', sans-serif",
-              }}
-            />
-            {/* Ícone filtro */}
-            <button
-              aria-label="Filtrar"
-              onClick={() => {}}
-              style={{ background: "none", border: "none", cursor: "pointer", padding: "0 2px", display: "flex" }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <line x1="2"  y1="5"  x2="18" y2="5"  stroke="#999" strokeWidth="1.4" strokeLinecap="round"/>
-                <line x1="4"  y1="5"  x2="4"  y2="2"  stroke="#999" strokeWidth="1.4" strokeLinecap="round"/>
-                <line x1="2"  y1="10" x2="18" y2="10" stroke="#999" strokeWidth="1.4" strokeLinecap="round"/>
-                <line x1="15" y1="10" x2="15" y2="7"  stroke="#999" strokeWidth="1.4" strokeLinecap="round"/>
-                <line x1="2"  y1="15" x2="18" y2="15" stroke="#999" strokeWidth="1.4" strokeLinecap="round"/>
-                <line x1="9"  y1="15" x2="9"  y2="12" stroke="#999" strokeWidth="1.4" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
+          <TopicSearchBar
+            placeholder={"Pesquisar temas de redação..."}
+            query={query}
+            onChange={e => setQuery(e.target.value)}
+            availableTags={availableTags}
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+            sortOrder={sortOrder}
+            onSortChange={setSortOrder}
+          />
  
  
           {/* Lista de temas */}
@@ -160,7 +147,7 @@ export default function InterfaceProf() {
                     >
                     <EssayTopicCard
                         title={topic.title}
-                        done={topic.done}
+                        status={topic.status}
                         onClick={() => navigate(`/proposta/${topic.id_proposta}`)}
                     />
                     </div>

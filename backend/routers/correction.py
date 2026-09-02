@@ -53,7 +53,10 @@ def create_correction(
         comments=db_comments,
     )
 
+    essay.status = "done"
+
     session.add(db_correction)
+    session.add(essay)
     session.commit()
     session.refresh(db_correction)
 
@@ -98,25 +101,33 @@ def create_ai_correction(
     
     db_support_texts = essay.proposta.support_texts
 
-    textos_apoio_adaptados = ""
+    support_texts_adapted = ""
     for support_text in db_support_texts:
         if support_text.content:
-            textos_apoio_adaptados += support_text.content + " "
+            support_texts_adapted += support_text.content + " "
 
-    textos_apoio_adaptados = textos_apoio_adaptados.strip() or None
+    support_texts_adapted = support_texts_adapted.strip() or None
 
-    retorno_plagio = plagio.detectar_copia(essay.submitted_text, textos_apoio_adaptados)
+    plagiarism_feedback = plagio.detectar_copia(essay.submitted_text, support_texts_adapted)
 
     try:
         ai_correction = corretor.corrigir_redacao(
             redacao=essay.submitted_text,
             titulo_tema=essay.proposta.title,
-            textos_apoio=textos_apoio_adaptados,
-            plagio=retorno_plagio,
+            textos_apoio=support_texts_adapted,
+            plagio=plagiarism_feedback,
             api_key=settings.ANTHROPIC_API_KEY,
         )
     except ErroDeCorrecao as e:
         raise HTTPException(status_code=e.status, detail=e.mensagem)
+
+
+    general_feedback_ai = ai_correction.melhorias
+    general_feedback_formatted = ""
+
+    for comment in general_feedback_ai:
+        general_feedback_formatted += comment + "\n\n"
+
 
     feedback = f"""
 COMPETÊNCIA 1:
@@ -135,7 +146,7 @@ COMPETÊNCIA 5:
 {ai_correction.competencias[4].feedback}
 
 COMENTÁRIOS GERAIS:
-{ai_correction.melhorias}"""
+{general_feedback_formatted}"""
 
     db_correction = Correction(
             c1_score=ai_correction.competencias[0].nota,
