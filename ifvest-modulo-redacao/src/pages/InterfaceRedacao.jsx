@@ -88,6 +88,7 @@ export default function InterfaceRedacao(){
                     source: st.source,
                     imageUrl: st.type === "image" ? resolveStaticUrl(st.image_url) : null,
                 }));
+
           setComponentList(textos);
           setIsLoading(false);
         }catch (error){

@@ -37,6 +37,18 @@ export default function InterfaceMinhasPropostas() {
     return new Date(isoString).toLocaleDateString("pt-BR");
   }
 
+  async function handleDeleteProposta(id) {
+    if (!window.confirm("Tem certeza que deseja remover esta proposta?")) return;
+
+    try {
+      await api.delete(`/proposta/${id}/`);
+      setPropostas(prev => prev.filter(p => p.id_proposta !== id));
+    } catch (error) {
+      console.error("Erro ao remover proposta:", error);
+      alert("Não foi possível remover a proposta.");
+    }
+  }
+
   if (isLoading) return <LoadingScreen message="Carregando propostas..." />;
 
   return (
@@ -62,6 +74,7 @@ export default function InterfaceMinhasPropostas() {
                   creationDate={formatDate(proposta.created_at)}
                   tags={proposta.tags} 
                   onClick={() => handleCardClick(proposta.id_proposta)}
+                  onDelete={() => handleDeleteProposta(proposta.id_proposta)}
                 />
               ))
             ) : (

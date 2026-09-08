@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/App.css";
 
-export function PropostaCard({ title, creationDate, tags, onClick }) {
+export function PropostaCard({ title, creationDate, tags, onClick, onDelete }) {
   return (
     <div
       className="card-proposta"
@@ -10,6 +10,20 @@ export function PropostaCard({ title, creationDate, tags, onClick }) {
       onClick={onClick}
       onKeyDown={e => e.key === "Enter" && onClick?.()}
     >
+      {onDelete && (
+        <button
+          aria-label="Remover proposta"
+          onClick={e => { e.stopPropagation(); onDelete(); }}
+          className="btn-remover-proposta"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          </svg>
+        </button>
+      )}
+
       <div className="card-proposta-info">
         <span className="card-proposta-titulo">
           {title}
@@ -19,7 +33,7 @@ export function PropostaCard({ title, creationDate, tags, onClick }) {
           <span>
             Criada em: <span className="destaque">{creationDate}</span>
           </span>
-          
+
           {tags && tags.length > 0 && (
             <div className="card-proposta-tags">
               {tags.map((tag, index) => (

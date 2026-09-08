@@ -6,6 +6,7 @@ export default function BasicTxtBox({ placeholder, essayText, setEssayText, line
           onChange={e => setEssayText(e.target.value)}
           placeholder={placeholder}
           style={{
+            whiteSpace: "pre-line",
             flex: 1,
             width: "100%",
             height: "100%", 

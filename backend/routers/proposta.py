@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Form, HTTPException
 from typing import List, Optional
-from sqlmodel import Session, select
+from sqlmodel import Session, select, delete
 from datetime import datetime
 from database import get_session
-from models import Proposta, PropostaCreate, PropostaPublic, PropostaDetail, PropostaUpdate, SupportText
+from models import Proposta, PropostaCreate, PropostaPublic, PropostaDetail, PropostaUpdate, SupportText, Essay
 from schemas import PropostaListItem
 
 router = APIRouter(
@@ -99,3 +99,27 @@ def update_proposta(
     session.commit()
     session.refresh(db_proposta)
     return db_proposta
+
+@router.delete("/{id_proposta}/")
+def delete_proposta(
+    *,
+    session: Session = Depends(get_session),
+    id_proposta: int,
+):
+    db_proposta = session.get(Proposta, id_proposta)
+    if not db_proposta:
+        raise HTTPException(status_code=404, detail="Proposta não encontrada")
+
+    statement = select(Essay).where(Essay.proposta_id == id_proposta)
+    db_essay = session.exec(statement).first()
+
+    if db_essay:
+        raise HTTPException(status_code=400, detail="Propostas que possuem redações já feitas não podem ser apagadas")
+
+    statement = delete(SupportText).where(SupportText.id_proposta == id_proposta)
+    session.exec(statement)
+
+    session.delete(db_proposta)
+    session.commit()
+
+    
