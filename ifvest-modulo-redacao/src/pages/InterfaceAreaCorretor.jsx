@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import T from "../styles/tokens.js";
+import T from "../styles/tokens";
 import { useNavigate } from "react-router-dom";
-import api from "../api.js";
-import { Header } from "../components/Header.js";
-import { SubHeader } from "../components/SubHeader.js";
-import { PaginationBar } from "../components/Paginacao.js";
-import { Footer } from "../components/Footer.js";
-import { CorrectionTopicCard } from "../components/CardRedacaoAluno.js";
-import { LoadingScreen } from "../components/TelaCarregamento.js";
+import api from "../api";
+import { Header } from "../components/Header";
+import { SubHeader } from "../components/SubHeader";
+import { PaginationBar } from "../components/Paginacao";
+import { Footer } from "../components/Footer";
+import { CorrectionTopicCard } from "../components/CardRedacaoAluno";
+import { LoadingScreen } from "../components/TelaCarregamento";
 
 export default function InterfaceAreaCorretor() {
   const [pendingEssays, setPendingEssays] = useState([]);

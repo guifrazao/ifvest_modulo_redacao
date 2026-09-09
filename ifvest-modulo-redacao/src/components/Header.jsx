@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/App.css"
-import { ActionButton } from "./BotaoAcao.js";
-import { rotaPrincipal } from "../globals.js";
+import { ActionButton } from "./BotaoAcao";
+import { rotaPrincipal } from "../globals";
 export function Header({ onProfileClick, currentModule="Redações" }) {
   const navigate = useNavigate()
 

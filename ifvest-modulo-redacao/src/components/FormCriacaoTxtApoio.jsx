@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import T from "../styles/tokens";
 import { ActionButton } from "./BotaoAcao";
 import { UploadForm } from "./FormUpload";
-import { SupportTextItem } from "./TextoApoio";
+import { RichTextEditor } from "./EditorTexto";
 
 export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
   // Estados principais do formulário
@@ -93,12 +93,16 @@ export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
 
       {/* Form da aba texto */}
       {type === "texto" ? (
-        <textarea 
-          placeholder="Educação Profissional é o modelo de aprendizagem com foco no desenvolvimento de competências e habilidades técnicas..."
+        // <textarea 
+        //   placeholder="Educação Profissional é o modelo de aprendizagem com foco no desenvolvimento de competências e habilidades técnicas..."
+        //   value={bodyText}
+        //   onChange={(e) => setBodyText(e.target.value)}
+        //   className="aba-texto-criacao-txt-apoio"
+        //   style={{resize: "none", boxSizing: "border-box",}}
+        // />
+        <RichTextEditor
           value={bodyText}
-          onChange={(e) => setBodyText(e.target.value)}
-          className="aba-texto-criacao-txt-apoio"
-          style={{resize: "none", boxSizing: "border-box",}}
+          onChange={(newText) => setBodyText(newText)}
         />
       ) : (
         /* Form de uplaod da aba figura */

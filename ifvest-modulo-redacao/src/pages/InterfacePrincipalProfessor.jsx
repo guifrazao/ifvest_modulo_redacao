@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import T from "../styles/tokens.js";
-import api from "../api.js"
-import { idCorretor } from '../globals.js'; //REMOVER ISSO E O RESTO DOS USUARIOS FALSOS DEPOIS QUANDO INTEGRAR COM LOGIN
-import { Header } from '../components/Header.js';
-import { SubHeader } from '../components/SubHeader.js';
-import { EssayTopicCard } from '../components/CardRedacao.js';
-import { PaginationBar } from '../components/Paginacao.js';
-import { Footer } from '../components/Footer.js';
-import { TopicSearchBar } from '../components/BarraPesquisa.js';
-import { ActionButton } from '../components/BotaoAcao.js';
-import { LoadingScreen } from '../components/TelaCarregamento.js';
+import T from "../styles/tokens";
+import api from "../api"
+import { idCorretor } from '../globals'; //REMOVER ISSO E O RESTO DOS USUARIOS FALSOS DEPOIS QUANDO INTEGRAR COM LOGIN
+import { Header } from '../components/Header';
+import { SubHeader } from '../components/SubHeader';
+import { EssayTopicCard } from '../components/CardRedacao';
+import { PaginationBar } from '../components/Paginacao';
+import { Footer } from '../components/Footer';
+import { TopicSearchBar } from '../components/BarraPesquisa';
+import { ActionButton } from '../components/BotaoAcao';
+import { LoadingScreen } from '../components/TelaCarregamento';
 
 /* TODO: Sinalização do status de progresso da redação/correção (não feita/aguardando correção/feita), implementar paginação */
 

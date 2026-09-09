@@ -1,8 +1,8 @@
 import T from "../styles/tokens"
 import api from "../api";
-import { resolveStaticUrl } from "../utils/media.js";
-import { idCorretor } from "../globals.js";
-import { rotaPrincipal } from "../globals.js"
+import { resolveStaticUrl } from "../utils/media";
+import { idCorretor } from "../globals";
+import { rotaPrincipal } from "../globals"
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";

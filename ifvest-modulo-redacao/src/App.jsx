@@ -1,13 +1,13 @@
 import './styles/App.css'
-import { tipoUsuario, rotaPrincipal, rotaArea } from "./globals.js"
+import { tipoUsuario, rotaPrincipal, rotaArea } from "./globals"
 import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
-import InterfacePrincipal from './pages/InterfacePrincipal';
-import InterfaceProf from './pages/InterfacePrincipalProfessor';
-import InterfaceRedacao from './pages/InterfaceRedacao';
-import InterfaceCriarRedacao from './pages/InterfaceCriarRedacao';
-import InterfaceCorrecao from './pages/InterfaceCorrecao';
-import InterfaceAreaAluno from './pages/InterfaceAreaAluno';
-import InterfaceAreaCorretor from './pages/InterfaceAreaCorretor';
+import InterfacePrincipal from './pages/InterfacePrincipal.jsx';
+import InterfaceProf from './pages/InterfacePrincipalProfessor.jsx';
+import InterfaceRedacao from './pages/InterfaceRedacao.jsx';
+import InterfaceCriarRedacao from './pages/InterfaceCriarRedacao.jsx';
+import InterfaceCorrecao from './pages/InterfaceCorrecao.jsx';
+import InterfaceAreaAluno from './pages/InterfaceAreaAluno.jsx';
+import InterfaceAreaCorretor from './pages/InterfaceAreaCorretor.jsx';
 import InterfaceMinhasPropostas from './pages/InterfaceMinhasPropostas.jsx';
 import InterfaceEditarProposta from './pages/InterfaceEditarProposta.jsx';
 

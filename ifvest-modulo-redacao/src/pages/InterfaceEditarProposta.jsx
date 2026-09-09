@@ -1,6 +1,6 @@
 import T from "../styles/tokens"
 import api from "../api";
-import { idCorretor, rotaPrincipal } from "../globals.js";
+import { idCorretor, rotaPrincipal } from "../globals";
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
@@ -10,8 +10,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ActionButton } from "../components/BotaoAcao";
 import { SuppTextCreationArea } from "../components/FormCriacaoTxtApoio";
 import { TagsInput } from "../components/TagsInput";
-import { LoadingScreen } from "../components/TelaCarregamento.js";
-import { resolveStaticUrl } from "../utils/media.js";
+import { LoadingScreen } from "../components/TelaCarregamento";
+import { resolveStaticUrl } from "../utils/media";
 
 export default function InterfaceEditarProposta(){
     const { id } = useParams();

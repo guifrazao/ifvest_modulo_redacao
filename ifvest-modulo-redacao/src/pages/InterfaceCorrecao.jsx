@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../api.js";
-import { resolveStaticUrl } from "../utils/media.js";
-import { idCorretor } from "../globals.js";
+import api from "../api";
+import { resolveStaticUrl } from "../utils/media";
+import { idCorretor } from "../globals";
 import { Header } from "../components/Header";
 import { SubHeader } from "../components/SubHeader";
 import { Footer } from "../components/Footer";
-import { ActionButton } from "../components/BotaoAcao.js";
+import { ActionButton } from "../components/BotaoAcao";
 import { AnnotationForm } from "../components/FormComentario";
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
 import { LoadingScreen } from "../components/TelaCarregamento";

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api.js";
-import { idCorretor } from "../globals.js";
-import { Header } from "../components/Header.js";
-import { SubHeader } from "../components/SubHeader.js";
-import { PaginationBar } from "../components/Paginacao.js";
-import { Footer } from "../components/Footer.js";
-import { LoadingScreen } from "../components/TelaCarregamento.js";
-import { PropostaCard } from "../components/CardProposta.js"; 
+import api from "../api";
+import { idCorretor } from "../globals";
+import { Header } from "../components/Header";
+import { SubHeader } from "../components/SubHeader";
+import { PaginationBar } from "../components/Paginacao";
+import { Footer } from "../components/Footer";
+import { LoadingScreen } from "../components/TelaCarregamento";
+import { PropostaCard } from "../components/CardProposta"; 
 import "../styles/App.css";
 
 export default function InterfaceMinhasPropostas() {

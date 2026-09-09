@@ -474,6 +474,7 @@
       color: "#333";
       line-height: 18px; 
       margin-bottom: 6px;
+      text-align: left;
     }
 
     .fonte-txt-apoio {
@@ -561,6 +562,87 @@
       font-size: 14px;
       outline: none;
       background: #fff;
+    }
+
+    .lexical-editor-container {
+      width: 100%;
+      border: 2px solid var(--borda-txtbox-criar-txt-apoio, #2d6a4f);
+      border-radius: 18px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .lexical-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #dcdcdc;
+    }
+
+    .toolbar-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+      transition: background 0.2s;
+    }
+
+    .toolbar-btn:hover {
+      background: #e0e0e0;
+      border-color: #ccc;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background-color: #dcdcdc;
+      margin: 0 4px;
+    }
+
+    .lexical-editor-inner {
+      position: relative;
+      flex: 1;
+    }
+
+    .lexical-content-editable {
+      min-height: 110px;
+      padding: 10px 14px;
+      font-size: 14px;
+      outline: none;
+      color: #333;
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    .lexical-placeholder {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      color: #999;
+      pointer-events: none;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    /* Classes de tema do Lexical */
+    .editor-text-bold {
+      font-weight: bold;
+    }
+
+    .editor-text-italic {
+      font-style: italic;
+    }
+
+    .editor-text-underline {
+      text-decoration: underline;
     }
 
     .aba-figura-criacao-txt-apoio {

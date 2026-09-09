@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import api from "../api.js";
-import T from "../styles/tokens.js";
+import api from "../api";
+import T from "../styles/tokens";
 import "../styles/App.css";
 
 export function CorrectionTopicCard({ 

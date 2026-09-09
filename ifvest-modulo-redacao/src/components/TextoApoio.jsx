@@ -38,7 +38,7 @@ export function SupportTextItem({ type = "text", label, title, body, source, ima
       <p className="titulo-txt-apoio">{title}</p>
 
       {type === "text" && (
-        <p className="corpo-txt-apoio">{body}</p>
+        <p className="corpo-txt-apoio" dangerouslySetInnerHTML={{__html: body}}></p>
       )}
       
       <p className="fonte-txt-apoio">Disponível em: {source}</p>

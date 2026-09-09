@@ -2,16 +2,16 @@ import React, { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import { useNavigate, useNavigation } from 'react-router-dom';
 import "../styles/App.css"
-import api from "../api.js"
-import { idUsuario } from '../globals.js';
-import { Header } from '../components/Header.js';
-import { SubHeader } from '../components/SubHeader.js';
-import { TopicSearchBar } from '../components/BarraPesquisa.js';
-import { EssayTopicCard } from '../components/CardRedacao.js';
-import { PaginationBar } from '../components/Paginacao.js';
-import { Footer } from '../components/Footer.js';
-import { ActionButton } from '../components/BotaoAcao.js';
-import { LoadingScreen } from '../components/TelaCarregamento.js';
+import api from "../api"
+import { idUsuario } from '../globals';
+import { Header } from '../components/Header';
+import { SubHeader } from '../components/SubHeader';
+import { TopicSearchBar } from '../components/BarraPesquisa';
+import { EssayTopicCard } from '../components/CardRedacao';
+import { PaginationBar } from '../components/Paginacao';
+import { Footer } from '../components/Footer';
+import { ActionButton } from '../components/BotaoAcao';
+import { LoadingScreen } from '../components/TelaCarregamento';
 
 /* TODO: implementar paginação */
 

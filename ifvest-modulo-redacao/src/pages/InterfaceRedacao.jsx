@@ -1,6 +1,6 @@
 import "../styles/App.css"
-import api from "../api.js"
-import "../globals.js"
+import api from "../api"
+import "../globals"
 import { Header } from "../components/Header"
 import { SubHeader } from "../components/SubHeader"
 import { SupportTextsContainer } from "../components/ContainerTextosApoio";
@@ -9,9 +9,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { EssayWritingBox } from "../components/AreaRedacao";
 import { ActionButton } from "../components/BotaoAcao";
-import { LoadingScreen } from "../components/TelaCarregamento.js";
-import { idUsuario, idCorretor, rotaArea, idIA } from "../globals.js"
-import { resolveStaticUrl } from "../utils/media.js"
+import { LoadingScreen } from "../components/TelaCarregamento";
+import { idUsuario, idCorretor, rotaArea, idIA } from "../globals"
+import { resolveStaticUrl } from "../utils/media"
 
 /* TODO: Mudar lineHeight da área de digitação, implementar orientações abaixo dos textos de apoio (redija uma redação com o tema...), dar mais destaque ao título*/
 
