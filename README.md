@@ -123,7 +123,7 @@ npm start
 | `MONTHLY_LIMIT` | `10` | Limite mensal de correções por IA |
 | `MODEL` | `claude-opus-5` | Modelo utilizado da IA de correção |
 | `MAX_TOKENS` | `8000` | Quantidade máxima de tokens da IA de correção |
-| `EFFORT` | `Medium` | Esforço feito pela IA de correção |
+| `EFFORT` | `medium` | Esforço feito pela IA de correção |
 
 ---
 
