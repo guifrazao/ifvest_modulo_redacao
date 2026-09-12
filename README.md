@@ -4,17 +4,17 @@
 
 # 🚀 Funcionalidades
 
-✅ Criação de propostas de redação com textos de apoio (texto ou imagem)
-✅ Editor de texto rico (negrito, itálico, tamanho de fonte, etc.) para textos de apoio
-✅ Submissão de redações digitadas ou via upload de imagem
-✅ OCR multimodal com IA (Groq VLM) para extração de texto de imagens
-✅ Correção humana por professor, com comentários por competência (padrão ENEM)
-✅ Correção automática por IA (Anthropic/Claude), com feedback geral e notas por competência
-✅ Notas por competência de 0 a 200 (múltiplos de 40), seguindo o modelo do ENEM
-✅ Detecção de cópia de trechos dos textos de apoio (plágio)
-✅ Organização de propostas por tags, com filtragem por tag e data
-✅ Áreas separadas para aluno e professor/corretor
-✅ Edição e remoção de propostas e textos de apoio
+✅ Criação de propostas de redação com textos de apoio (texto ou imagem)  
+✅ Editor de texto rico (negrito, itálico, tamanho de fonte, etc.) para textos de apoio  
+✅ Submissão de redações digitadas ou via upload de imagem  
+✅ OCR multimodal com IA (Groq VLM) para extração de texto de imagens  
+✅ Correção humana por professor, com comentários por competência (padrão ENEM)  
+✅ Correção automática por IA (Anthropic/Claude), com feedback geral e notas por competência  
+✅ Notas por competência de 0 a 200 (múltiplos de 40), seguindo o modelo do ENEM  
+✅ Detecção de cópia de trechos dos textos de apoio (plágio)  
+✅ Organização de propostas por tags, com filtragem por tag e data  
+✅ Áreas separadas para aluno e professor/corretor  
+✅ Edição e remoção de propostas e textos de apoio  
 
 ---
 
