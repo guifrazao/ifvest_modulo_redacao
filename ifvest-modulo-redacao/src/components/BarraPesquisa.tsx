@@ -1,4 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, ChangeEvent } from "react";
+
+export type SortOrder = "recent" | "oldest";
+
+interface TopicSearchBarProps {
+  query: string;
+  placeholder?: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  availableTags?: string[];
+  selectedTags?: string[];
+  onTagsChange: (tags: string[]) => void;
+  sortOrder?: SortOrder;
+  onSortChange: (sort: SortOrder) => void;
+}
 
 export function TopicSearchBar({
   query,
@@ -9,13 +22,13 @@ export function TopicSearchBar({
   onTagsChange,
   sortOrder = "recent",
   onSortChange,
-}) {
+}: TopicSearchBarProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+    function handleClickOutside(e: globalThis.MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setIsFilterOpen(false);
       }
     }
@@ -25,9 +38,9 @@ export function TopicSearchBar({
     return () => window.removeEventListener("mousedown", handleClickOutside);
   }, [isFilterOpen]);
 
-  function toggleTag(tag) {
+  function toggleTag(tag: string) {
     if (selectedTags.includes(tag)) {
-      onTagsChange(selectedTags.filter(t => t !== tag));
+      onTagsChange(selectedTags.filter((t) => t !== tag));
     } else {
       onTagsChange([...selectedTags, tag]);
     }
@@ -54,16 +67,16 @@ export function TopicSearchBar({
 
         <button
           aria-label="Filtrar"
-          onClick={() => setIsFilterOpen(prev => !prev)}
+          onClick={() => setIsFilterOpen((prev) => !prev)}
           className={`btn-filtro ${filtrosAtivos ? "btn-filtro-ativo" : ""}`}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <line x1="2"  y1="5"  x2="18" y2="5"  stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round"/>
-            <line x1="4"  y1="5"  x2="4"  y2="2"  stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round"/>
-            <line x1="2"  y1="10" x2="18" y2="10" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round"/>
-            <line x1="15" y1="10" x2="15" y2="7"  stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round"/>
-            <line x1="2"  y1="15" x2="18" y2="15" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round"/>
-            <line x1="9"  y1="15" x2="9"  y2="12" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round"/>
+            <line x1="2" y1="5" x2="18" y2="5" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="4" y1="5" x2="4" y2="2" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="2" y1="10" x2="18" y2="10" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="15" y1="10" x2="15" y2="7" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="2" y1="15" x2="18" y2="15" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="9" y1="15" x2="9" y2="12" stroke={filtrosAtivos ? "#2d6a4f" : "#999"} strokeWidth="1.4" strokeLinecap="round" />
           </svg>
         </button>
       </div>
@@ -96,7 +109,7 @@ export function TopicSearchBar({
             <div className="filtro-secao">
               <p className="filtro-secao-titulo">Tags</p>
               <div className="filtro-tags-lista">
-                {availableTags.map(tag => (
+                {availableTags.map((tag) => (
                   <label key={tag} className="filtro-checkbox-item">
                     <input
                       type="checkbox"

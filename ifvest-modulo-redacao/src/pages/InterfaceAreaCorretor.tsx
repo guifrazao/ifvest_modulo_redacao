@@ -8,19 +8,24 @@ import { Footer } from "../components/Footer";
 import { CorrectionTopicCard } from "../components/CardRedacaoAluno";
 import { LoadingScreen } from "../components/TelaCarregamento";
 
+export interface EssayItem {
+  id: number | string;
+  title: string;
+  submitted_at: string;
+}
+
 export default function InterfaceAreaCorretor() {
-  const [pendingEssays, setPendingEssays] = useState([]);
-  const [correctedEssays, setCorrectedEssays] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [pendingEssays, setPendingEssays] = useState<EssayItem[]>([]);
+  const [correctedEssays, setCorrectedEssays] = useState<EssayItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchEssays() {
       try {
-        // Busca redações pendentes e corrigidas paralelamente
         const [pendingRes, correctedRes] = await Promise.all([
-          api.get("/essay/pending/"),
-          api.get("/essay/corrected/") // Nova rota configurada abaixo
+          api.get<EssayItem[]>("/essay/pending/"),
+          api.get<EssayItem[]>("/essay/corrected/")
         ]);
         
         setPendingEssays(pendingRes.data);
@@ -34,12 +39,11 @@ export default function InterfaceAreaCorretor() {
     fetchEssays();
   }, []);
 
-  const handleCardClick = (id) => {
-    // Redireciona para a tela de correção passando o ID da redação
-    navigate(`/correcao/${id}`);
+  const handleCardClick = (id: number | string) => {
+    navigate(`/corrigir/${id}`);
   };
 
-  function formatDate(isoString) {
+  function formatDate(isoString: string) {
     return new Date(isoString).toLocaleDateString("pt-BR");
   }
 
@@ -92,7 +96,7 @@ export default function InterfaceAreaCorretor() {
                   key={essay.id}
                   id={essay.id}
                   title={essay.title}
-                  done={false}
+                  status="not_done"
                   submissionDate={formatDate(essay.submitted_at)}
                   onClick={() => handleCardClick(essay.id)}
                 />
@@ -103,10 +107,10 @@ export default function InterfaceAreaCorretor() {
           </div>
         </section>
 
-        {/* Redações Corrigidas */}
+        {/* Redações Corrigidas por Mim */}
         <section style={{ marginBottom: "40px" }}>
           <h2 style={{ fontSize: "12px", fontWeight: "600", color: "#757575", margin: "0 0 8px 0", fontFamily: "'Roboto', sans-serif" }}>
-            Redações corrigidas
+            Redações corrigidas por mim
           </h2>
           <hr style={{ border: "none", borderTop: "1px solid #e8e8e8", marginBottom: "16px" }} />
           
@@ -128,7 +132,7 @@ export default function InterfaceAreaCorretor() {
           </div>
         </section>
 
-        <PaginationBar/>
+        {/*<PaginationBar/>*/}
 
       </main>
 

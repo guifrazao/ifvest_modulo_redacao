@@ -1,4 +1,38 @@
-export function SupportTextItem({ type = "text", label, title, body, source, imageUrl, editable = false, onEdit, onDelete }) {
+import React from "react";
+
+interface BaseSupportTextProps {
+  label?: string;
+  title?: string;
+  source?: string;
+  editable?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}
+
+interface TextSupportTextProps extends BaseSupportTextProps {
+  type?: "text";
+  body?: string;
+  imageUrl?: never;
+}
+
+interface ImageSupportTextProps extends BaseSupportTextProps {
+  type: "image";
+  imageUrl?: string;
+  body?: never;
+}
+
+export type SupportTextItemProps = TextSupportTextProps | ImageSupportTextProps;
+
+export function SupportTextItem(props: SupportTextItemProps) {
+  const {
+    label,
+    title,
+    source,
+    editable = false,
+    onEdit,
+    onDelete,
+  } = props;
+
   return (
     <div style={{ marginBottom: 18, position: "relative" }}>
       {editable && (
@@ -7,9 +41,15 @@ export function SupportTextItem({ type = "text", label, title, body, source, ima
             onClick={onEdit}
             aria-label="Editar texto de apoio"
             style={{
-              width: 28, height: 28, borderRadius: 6, border: "none",
-              background: "#e0e0e0", cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              border: "none",
+              background: "#e0e0e0",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -20,9 +60,15 @@ export function SupportTextItem({ type = "text", label, title, body, source, ima
             onClick={onDelete}
             aria-label="Excluir texto de apoio"
             style={{
-              width: 28, height: 28, borderRadius: 6, border: "none",
-              background: "#fbebeb", cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              border: "none",
+              background: "#fbebeb",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc3545" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -37,16 +83,16 @@ export function SupportTextItem({ type = "text", label, title, body, source, ima
       <p className="label-txt-apoio">{label}</p>
       <p className="titulo-txt-apoio">{title}</p>
 
-      {type === "text" && (
-        <p className="corpo-txt-apoio" dangerouslySetInnerHTML={{__html: body}}></p>
+      {props.type !== "image" && props.body && (
+        <p className="corpo-txt-apoio" dangerouslySetInnerHTML={{ __html: props.body }}></p>
       )}
-      
+
       <p className="fonte-txt-apoio">Disponível em: {source}</p>
-      
-      {type === "image" && (
-        imageUrl ? (
+
+      {props.type === "image" && (
+        props.imageUrl ? (
           <img
-            src={imageUrl}
+            src={props.imageUrl}
             alt={title || "Imagem do texto de apoio"}
             className="imagem-txt-apoio"
           />

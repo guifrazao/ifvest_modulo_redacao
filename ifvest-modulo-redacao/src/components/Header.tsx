@@ -1,11 +1,18 @@
+import React, { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/App.css"
+import "../styles/App.css";
 import { ActionButton } from "./BotaoAcao";
 import { rotaPrincipal } from "../globals";
-export function Header({ onProfileClick, currentModule="Redações" }) {
-  const navigate = useNavigate()
 
-  const navButtonLayout = {
+interface HeaderProps {
+  onProfileClick: () => void;
+  currentModule?: string;
+}
+
+export function Header({ onProfileClick, currentModule = "Redações" }: HeaderProps) {
+  const navigate = useNavigate();
+
+  const navButtonLayout: CSSProperties = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -19,7 +26,6 @@ export function Header({ onProfileClick, currentModule="Redações" }) {
     <header className="header">
 
       {/* ícone IFVest */}
-
       <div className="wrapper-logo-header">
         <ActionButton
           text={

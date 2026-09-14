@@ -1,5 +1,10 @@
+import React from "react";
 
-export function LoadingScreen({ message = "Carregando..." }) {
+export interface LoadingScreenProps {
+  message?: string;
+}
+
+export function LoadingScreen({ message = "Carregando..." }: LoadingScreenProps) {
   return (
     <div className="loading-overlay">
       <div className="loading-container">

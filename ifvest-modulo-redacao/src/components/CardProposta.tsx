@@ -1,19 +1,30 @@
-import React from "react";
+import React, { KeyboardEvent, MouseEvent } from "react";
 import "../styles/App.css";
 
-export function PropostaCard({ title, creationDate, tags, onClick, onDelete }) {
+export interface PropostaCardProps {
+  title: string;
+  creationDate: string;
+  tags?: string[];
+  onClick?: () => void;
+  onDelete?: () => void;
+}
+
+export function PropostaCard({ title, creationDate, tags, onClick, onDelete }: PropostaCardProps) {
   return (
     <div
       className="card-proposta"
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={e => e.key === "Enter" && onClick?.()}
+      onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => e.key === "Enter" && onClick?.()}
     >
       {onDelete && (
         <button
           aria-label="Remover proposta"
-          onClick={e => { e.stopPropagation(); onDelete(); }}
+          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            onDelete();
+          }}
           className="btn-remover-proposta"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -48,7 +59,10 @@ export function PropostaCard({ title, creationDate, tags, onClick, onDelete }) {
 
       <button
         aria-label="Abrir proposta"
-        onClick={e => { e.stopPropagation(); onClick?.(); }}
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
         className="btn-card-proposta"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
