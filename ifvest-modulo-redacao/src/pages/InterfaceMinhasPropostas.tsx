@@ -7,18 +7,25 @@ import { SubHeader } from "../components/SubHeader";
 import { PaginationBar } from "../components/Paginacao";
 import { Footer } from "../components/Footer";
 import { LoadingScreen } from "../components/TelaCarregamento";
-import { PropostaCard } from "../components/CardProposta"; 
+import { PropostaCard } from "../components/CardProposta";
 import "../styles/App.css";
 
+export interface Proposta {
+  id_proposta: number | string;
+  title: string;
+  created_at: string;
+  tags?: string[];
+}
+
 export default function InterfaceMinhasPropostas() {
-  const [propostas, setPropostas] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [propostas, setPropostas] = useState<Proposta[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchPropostas() {
       try {
-        const response = await api.get(`/proposta/creator/${idCorretor}/`);
+        const response = await api.get<Proposta[]>(`/proposta/creator/${idCorretor}/`);
         setPropostas(response.data);
       } catch (error) {
         console.error("Erro ao carregar propostas:", error);
@@ -29,20 +36,20 @@ export default function InterfaceMinhasPropostas() {
     fetchPropostas();
   }, []);
 
-  const handleCardClick = (id) => {
+  const handleCardClick = (id: number | string) => {
     navigate(`/proposta/edit/${id}`);
   };
 
-  function formatDate(isoString) {
+  function formatDate(isoString: string): string {
     return new Date(isoString).toLocaleDateString("pt-BR");
   }
 
-  async function handleDeleteProposta(id) {
+  async function handleDeleteProposta(id: number | string) {
     if (!window.confirm("Tem certeza que deseja remover esta proposta?")) return;
 
     try {
       await api.delete(`/proposta/${id}/`);
-      setPropostas(prev => prev.filter(p => p.id_proposta !== id));
+      setPropostas((prev) => prev.filter((p) => p.id_proposta !== id));
     } catch (error) {
       console.error("Erro ao remover proposta:", error);
       alert("Não foi possível remover a proposta.");
@@ -58,7 +65,6 @@ export default function InterfaceMinhasPropostas() {
       <SubHeader title="Minhas Propostas" onBack={() => navigate(-1)} />
 
       <main className="minhas-propostas-main">
-
         <section className="minhas-propostas-section">
           <h2 className="minhas-propostas-titulo">
             Propostas criadas por mim
@@ -67,12 +73,12 @@ export default function InterfaceMinhasPropostas() {
 
           <div className="minhas-propostas-grid">
             {propostas.length > 0 ? (
-              propostas.map(proposta => (
+              propostas.map((proposta) => (
                 <PropostaCard
                   key={proposta.id_proposta}
                   title={proposta.title}
                   creationDate={formatDate(proposta.created_at)}
-                  tags={proposta.tags} 
+                  tags={proposta.tags}
                   onClick={() => handleCardClick(proposta.id_proposta)}
                   onDelete={() => handleDeleteProposta(proposta.id_proposta)}
                 />
@@ -83,8 +89,7 @@ export default function InterfaceMinhasPropostas() {
           </div>
         </section>
 
-        <PaginationBar/>
-
+        {/* <PaginationBar /> */}
       </main>
 
       <Footer />

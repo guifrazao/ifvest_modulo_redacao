@@ -1,25 +1,55 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, ChangeEvent } from "react";
 import T from "../styles/tokens";
 import { ActionButton } from "./BotaoAcao";
 import { UploadForm } from "./FormUpload";
 import { RichTextEditor } from "./EditorTexto";
 
-export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
+export type SuppTextType = "figura" | "texto";
+
+export interface InitialSupportTextData {
+  title?: string;
+  type?: "image" | "figura" | "text" | "texto";
+  body?: string;
+  source?: string;
+}
+
+export interface SupportTextInsertData {
+  title: string;
+  type: SuppTextType;
+  bodyText: string | null;
+  source: string;
+  file: File | null;
+  previewUrl: string | null;
+}
+
+export interface SuppTextCreationAreaProps {
+  onCancel?: () => void;
+  onInsert?: (data: SupportTextInsertData) => void;
+  initialData: InitialSupportTextData | undefined;
+}
+
+export function SuppTextCreationArea({
+  onCancel,
+  onInsert,
+  initialData,
+}: SuppTextCreationAreaProps) {
   // Estados principais do formulário
-  const [title, setTitle] = useState(initialData?.title || "");
-  const [type, setType] = useState(initialData?.type === "image" ? "figura" : "texto");
-  const [bodyText, setBodyText] = useState(initialData?.body || "");
-  const [source, setSource] = useState(initialData?.source || "");
-  
+  const [title, setTitle] = useState<string>(initialData?.title || "");
+  const [type, setType] = useState<SuppTextType>(
+    initialData?.type === "image" || initialData?.type === "figura" ? "figura" : "texto"
+  );
+  const [bodyText, setBodyText] = useState<string>(initialData?.body || "");
+  const [source, setSource] = useState<string>(initialData?.source || "");
+
   // Estados do componente de upload
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [uploadedFileName, setUploadedFileName] = useState(null);
-  const fileInputRef = useRef(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handlers para o gerenciamento de arquivos enviados
-  function handleFileChange(e) {
-    const file = e.target.files[0];
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -42,36 +72,36 @@ export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
     setPreviewUrl(null);
     setUploadedFileName(null);
   }
-  
+
   return (
-    <div 
-    className="form-criacao-txt-apoio"
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: 14,
-      boxSizing: "border-box",
-    }}>
-      
+    <div
+      className="form-criacao-txt-apoio"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 14,
+        boxSizing: "border-box",
+      }}
+    >
       {/* Input título */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>Título:</span>
-        <input 
+        <input
           className="input-titulo-criacao-txt-apoio"
-          type="text" 
-          placeholder="Insira o título do texto de apoio..." 
+          type="text"
+          placeholder="Insira o título do texto de apoio..."
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{flex: 1,}}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+          style={{ flex: 1 }}
         />
       </div>
 
-      {/* Abas figura/texto (as mesmas da área de redação) */}
+      {/* Abas figura/texto */}
       <div style={{ display: "flex", gap: 12, width: "100%" }}>
         {/* Aba Figura */}
         <div className="abas-area-redacao" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          <ActionButton 
-            text="Figura" 
+          <ActionButton
+            text="Figura"
             onClick={() => setType("figura")}
             color={type === "figura" ? T.fundoTabAtiva : T.fundoTabInativa}
             textColor="#000000"
@@ -81,8 +111,8 @@ export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
 
         {/* Aba Texto */}
         <div className="abas-area-redacao" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          <ActionButton 
-            text="Texto" 
+          <ActionButton
+            text="Texto"
             onClick={() => setType("texto")}
             color={type === "texto" ? T.fundoTabAtiva : T.fundoTabInativa}
             textColor="#000000"
@@ -93,29 +123,21 @@ export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
 
       {/* Form da aba texto */}
       {type === "texto" ? (
-        // <textarea 
-        //   placeholder="Educação Profissional é o modelo de aprendizagem com foco no desenvolvimento de competências e habilidades técnicas..."
-        //   value={bodyText}
-        //   onChange={(e) => setBodyText(e.target.value)}
-        //   className="aba-texto-criacao-txt-apoio"
-        //   style={{resize: "none", boxSizing: "border-box",}}
-        // />
         <RichTextEditor
           value={bodyText}
-          onChange={(newText) => setBodyText(newText)}
+          onChange={(newText: string) => setBodyText(newText)}
         />
       ) : (
-        /* Form de uplaod da aba figura */
-        <div 
-        className="aba-figura-criacao-txt-apoio"
-        style={{ overflow: "hidden",}}>
-          <UploadForm 
+        /* Form de upload da aba figura */
+        <div className="aba-figura-criacao-txt-apoio" style={{ overflow: "hidden" }}>
+          <UploadForm
             fileInputRef={fileInputRef}
             uploadedFile={uploadedFile}
             previewUrl={previewUrl}
-            uploadedFileName={uploadedFileName}
+            uploadedFileName={uploadedFileName ?? ""}
             handleFileChange={handleFileChange}
             handleRemoveFile={handleRemoveFile}
+            handleEssayUpload={() => {}}
           />
         </div>
       )}
@@ -123,40 +145,40 @@ export function SuppTextCreationArea({ onCancel, onInsert, initialData }) {
       {/* Input fonte */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>Fonte:</span>
-        <input 
+        <input
           className="input-fonte-criacao-txt-apoio"
-          type="text" 
-          placeholder="Insira a fonte do texto de apoio..." 
+          type="text"
+          placeholder="Insira a fonte do texto de apoio..."
           value={source}
-          onChange={(e) => setSource(e.target.value)}
-          style={{flex: 1,}}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setSource(e.target.value)}
+          style={{ flex: 1 }}
         />
       </div>
 
       {/* Botões criar e cancelar */}
       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-        <ActionButton 
+        <ActionButton
           text={initialData ? "Salvar alterações" : "Inserir texto de apoio"}
-          color="#2d6a4f"               
+          color="#2d6a4f"
           textColor="#ffffff"
           borderRadius={20}
           onClick={() => {
             if (onInsert) {
-              onInsert({ 
-                title, 
-                type, 
-                bodyText: type === "texto" ? bodyText : null, 
-                source, 
+              onInsert({
+                title,
+                type,
+                bodyText: type === "texto" ? bodyText : null,
+                source,
                 file: type === "figura" ? uploadedFile : null,
-                previewUrl: type === "figura" ? previewUrl : null
+                previewUrl: type === "figura" ? previewUrl : null,
               });
             }
           }}
         />
-        
-        <ActionButton 
+
+        <ActionButton
           text="Cancelar"
-          color="#e53935"             
+          color="#e53935"
           textColor="#ffffff"
           borderRadius={20}
           onClick={onCancel}

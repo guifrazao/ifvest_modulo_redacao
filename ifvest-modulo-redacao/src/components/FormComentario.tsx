@@ -1,12 +1,34 @@
-import React from "react";
+import React, { CSSProperties, ChangeEvent } from "react";
 import { ActionButton } from "./BotaoAcao";
 
-export function AnnotationForm({ 
-  competenciaSelecionada, 
-  onCompetenciaChange, 
+export interface CompetenciaOption {
+  id: number | string;
+  label: string;
+  cor: string;
+}
+
+export interface AnnotationFormProps {
+  competenciaSelecionada: string;
+  onCompetenciaChange: (value: string) => void;
+  competenciasDisponiveis?: CompetenciaOption[];
+  onDelete?: () => void;
+  comentario: string;
+  onComentarioChange: (value: string) => void;
+  isNovoComentario?: boolean;
+  onCriarComentario?: () => void;
+  isEditing?: boolean;
+  onStartEdit?: () => void;
+  onSaveEdit?: () => void;
+  readOnly?: boolean;
+  style?: CSSProperties;
+}
+
+export function AnnotationForm({
+  competenciaSelecionada,
+  onCompetenciaChange,
   competenciasDisponiveis = [],
-  onDelete, 
-  comentario, 
+  onDelete,
+  comentario,
   onComentarioChange,
   isNovoComentario,
   onCriarComentario,
@@ -14,9 +36,11 @@ export function AnnotationForm({
   onStartEdit,
   onSaveEdit,
   readOnly = false,
-  style
-}) {
-  const competenciaAtual = competenciasDisponiveis.find(c => c.label === competenciaSelecionada) || competenciasDisponiveis[0];
+  style,
+}: AnnotationFormProps) {
+  const competenciaAtual =
+    competenciasDisponiveis.find((c) => c.label === competenciaSelecionada) ||
+    competenciasDisponiveis[0];
 
   // No modo readOnly, força sempre a visualização (nunca criação/edição)
   const mostrarModoEdicao = !readOnly && (isNovoComentario || isEditing);
@@ -28,34 +52,51 @@ export function AnnotationForm({
         <div>
           <div className="popover-header">
             <div className="badge-competencia-view">
-              <span className="badge-dot" style={{ background: competenciaAtual ? competenciaAtual.cor : "#ccc" }} />
+              <span
+                className="badge-dot"
+                style={{ background: competenciaAtual ? competenciaAtual.cor : "#ccc" }}
+              />
               <span className="badge-text">{competenciaSelecionada}</span>
             </div>
           </div>
-          
+
           <p className="comment-view-text">
             {comentario || <em>Nenhum comentário inserido.</em>}
           </p>
 
           {!readOnly && (
             <div className="popover-actions-wrapper">
-              <ActionButton onClick={onStartEdit} text="Editar" color="#f0f0f0" textColor="#2d6a4f" borderRadius={20} />
-              <ActionButton onClick={onDelete} text="Excluir" color="#fbebeb" textColor="#dc3545" borderRadius={20} />
+              <ActionButton
+                onClick={onStartEdit}
+                text="Editar"
+                color="#f0f0f0"
+                textColor="#2d6a4f"
+                borderRadius={20}
+              />
+              <ActionButton
+                onClick={onDelete}
+                text="Excluir"
+                color="#fbebeb"
+                textColor="#dc3545"
+                borderRadius={20}
+              />
             </div>
           )}
         </div>
       ) : (
-
         <div>
           <div className="popover-header">
             <div className="select-competencia-container">
-              <span className="badge-dot" style={{ background: competenciaAtual ? competenciaAtual.cor : "#ccc" }} />
+              <span
+                className="badge-dot"
+                style={{ background: competenciaAtual ? competenciaAtual.cor : "#ccc" }}
+              />
               <select
                 value={competenciaSelecionada}
-                onChange={(e) => onCompetenciaChange(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => onCompetenciaChange(e.target.value)}
                 className="select-competencia-dropdown"
               >
-                {competenciasDisponiveis.map(c => (
+                {competenciasDisponiveis.map((c) => (
                   <option key={c.id} value={c.label}>
                     {c.label}
                   </option>
@@ -74,7 +115,7 @@ export function AnnotationForm({
 
           <textarea
             value={comentario}
-            onChange={(e) => onComentarioChange(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onComentarioChange(e.target.value)}
             placeholder="Digite o comentário sobre a competência..."
             className="popover-textarea"
           />

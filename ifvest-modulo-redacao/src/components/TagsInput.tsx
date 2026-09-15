@@ -1,21 +1,31 @@
-import React, { useState } from "react";
-import "../styles/App.css"
+import React, { useState, KeyboardEvent, ChangeEvent } from "react";
+import "../styles/App.css";
 
-export function TagsInput({ tags = [], onChange, initialOptions = [] }) {
-  const [availableOptions, setAvailableOptions] = useState(initialOptions);
-  const [showDropdown, setShowDropdown]         = useState(false);
-  const [inputValue, setInputValue]             = useState("");
+export interface TagsInputProps {
+  tags?: string[];
+  onChange: (tags: string[]) => void;
+  initialOptions?: string[];
+}
 
-  const handleAddTag = (option) => {
+export function TagsInput({
+  tags = [],
+  onChange,
+  initialOptions = [],
+}: TagsInputProps) {
+  const [availableOptions, setAvailableOptions] = useState<string[]>(initialOptions);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>("");
+
+  const handleAddTag = (option: string) => {
     if (!tags.includes(option)) onChange([...tags, option]);
     setShowDropdown(false);
   };
 
-  const handleRemoveTag = (tagToRemove) => {
+  const handleRemoveTag = (tagToRemove: string) => {
     onChange(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleCreateTag = (event) => {
+  const handleCreateTag = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== "Enter") return;
     event.preventDefault();
 
@@ -56,7 +66,7 @@ export function TagsInput({ tags = [], onChange, initialOptions = [] }) {
             placeholder="..."
             value={inputValue}
             onClick={() => setShowDropdown(!showDropdown)}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             onKeyDown={handleCreateTag}
             className="tags-input-field"
           />

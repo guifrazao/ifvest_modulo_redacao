@@ -1,4 +1,4 @@
-import React from "react";
+import { ChangeEvent } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -52,8 +52,14 @@ function ToolbarPlugin() {
   );
 }
 
+export interface RichTextEditorProps {
+  value?: string
+  onChange: (e: string) => void;
+}
+
 // Configuração do Editor
-export function RichTextEditor({ value, onChange }) {
+export function RichTextEditor({ value, onChange } : RichTextEditorProps) {
+
   const initialConfig = {
     namespace: "EditorApoio",
     theme: {
@@ -63,7 +69,7 @@ export function RichTextEditor({ value, onChange }) {
         underline: "editor-text-underline",
       },
     },
-    onError(error) {
+    onError(error: Error) {
       console.error(error);
     },
   };
