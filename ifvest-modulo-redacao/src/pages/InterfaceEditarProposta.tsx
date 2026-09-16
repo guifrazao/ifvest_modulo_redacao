@@ -89,44 +89,51 @@ export default function InterfaceEditarProposta() {
   }, [id]);
 
   async function handleUpdateSupportText(supportTextId: number | string, data: SupportTextFormData) {
-    try {
-      await api.put(`/support_text/${supportTextId}/`, {
-        title: data.title,
-        type: data.type === "figura" ? "image" : "text",
-        content: data.type === "texto" ? (data.bodyText ?? undefined) : undefined,
-        source: data.source,
-      });
+  try {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("type", data.type === "figura" ? "image" : "text");
+    formData.append("source", data.source);
 
-      setComponentList((prev) =>
-        prev.map((item): SupportTextWithId => {
-          if (item.id !== supportTextId) return item;
+    if (data.type === "texto") {
+      formData.append("content", data.bodyText || "");
+    } else if (data.file) {
+      formData.append("file", data.file);
+    }
 
-          const isImage = data.type === "figura";
-          if (isImage) {
-            return {
-              id: item.id,
-              type: "image",
-              label: item.label,
-              title: data.title,
-              source: data.source,
-              imageUrl: item.type === "image" ? item.imageUrl : undefined,
-            };
-          }
+    const response = await api.put<SupportTextApi>(`/support_text/${supportTextId}/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    setComponentList((prev) =>
+      prev.map((item): SupportTextWithId => {
+        if (item.id !== supportTextId) return item;
+
+        if (response.data.type === "image") {
           return {
             id: item.id,
-            type: "text",
+            type: "image",
             label: item.label,
-            title: data.title,
-            source: data.source,
-            body: data.bodyText ?? undefined,
+            title: response.data.title,
+            source: response.data.source,
+            imageUrl: resolveStaticUrl(response.data.image_url),
           };
-        })
-      );
-      setEditingId(null);
-    } catch (error) {
-      alert("Erro ao editar texto de apoio: " + error);
-    }
+        }
+        return {
+          id: item.id,
+          type: "text",
+          label: item.label,
+          title: response.data.title,
+          source: response.data.source,
+          body: response.data.content,
+        };
+      })
+    );
+    setEditingId(null);
+  } catch (error) {
+    alert("Erro ao editar texto de apoio: " + error);
   }
+}
 
   async function handleDeleteSupportText(supportTextId?: number | string) {
     if (!supportTextId) return;

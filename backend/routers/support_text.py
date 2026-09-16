@@ -58,15 +58,42 @@ def update_support_text(
     *,
     session: Session = Depends(get_session),
     support_text_id: int,
-    support_text_update: SupportTextUpdate,
+    title: str = Form(...),
+    type: str = Form(...),
+    content: str = Form(None),
+    source: str = Form(...),
+    file: UploadFile = File(None),
 ):
     db_support_text = session.get(SupportText, support_text_id)
     if not db_support_text:
         raise HTTPException(status_code=404, detail="Texto de apoio não encontrado")
 
-    update_data = support_text_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_support_text, field, value)
+    image_url = db_support_text.image_url
+
+    if type == "image":
+        if file:
+            extensao = os.path.splitext(file.filename)[1]
+            nome_arquivo = f"{uuid.uuid4().hex}{extensao}"
+            caminho_completo = os.path.join(UPLOAD_DIR, nome_arquivo)
+
+            with open(caminho_completo, "wb") as buffer:
+                buffer.write(file.file.read())
+
+            image_url = f"/static/support_texts/{nome_arquivo}"
+        elif not image_url:
+            raise HTTPException(
+                status_code=400,
+                detail="É necessário enviar um arquivo de imagem para textos de apoio do tipo figura"
+            )
+        content = None
+    else:
+        image_url = None
+
+    db_support_text.title = title
+    db_support_text.type = type
+    db_support_text.content = content
+    db_support_text.image_url = image_url
+    db_support_text.source = source
 
     session.add(db_support_text)
     session.commit()

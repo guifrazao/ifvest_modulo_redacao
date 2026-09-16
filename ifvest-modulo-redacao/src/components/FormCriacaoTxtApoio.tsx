@@ -25,7 +25,7 @@ export interface SupportTextInsertData {
 export interface SuppTextCreationAreaProps {
   onCancel?: () => void;
   onInsert?: (data: SupportTextInsertData) => void;
-  initialData: InitialSupportTextData | undefined;
+  initialData?: InitialSupportTextData;
 }
 
 export function SuppTextCreationArea({
