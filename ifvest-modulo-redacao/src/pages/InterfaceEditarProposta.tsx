@@ -11,6 +11,7 @@ import { SuppTextCreationArea } from "../components/FormCriacaoTxtApoio";
 import { TagsInput } from "../components/TagsInput";
 import { LoadingScreen } from "../components/TelaCarregamento";
 import { resolveStaticUrl } from "../utils/media";
+import { useAvailableTags } from "../utils/useAvailableTags";
 
 export interface SupportTextApi {
   id: number | string;
@@ -47,6 +48,13 @@ export default function InterfaceEditarProposta() {
   const [componentList, setComponentList] = useState<SupportTextWithId[]>([]);
   const [essayTitle, setEssayTitle] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
+
+  const fetchedTags = useAvailableTags();
+  const defaultTagOptions = ["Educação", "Economia", "Saúde"];
+  const availableTagOptions = React.useMemo(
+    () => [...new Set([...defaultTagOptions, ...fetchedTags])].sort(),
+    [fetchedTags]
+  );
 
   useEffect(() => {
     async function fetchProposta() {
@@ -275,7 +283,7 @@ export default function InterfaceEditarProposta() {
           <TagsInput
             tags={tags}
             onChange={setTags}
-            initialOptions={["Educação", "Economia", "Saúde"]}
+            initialOptions={availableTagOptions}
           />
 
           <ActionButton

@@ -11,6 +11,7 @@ import { Footer } from "../components/Footer";
 import { TopicSearchBar, SortOrder } from "../components/BarraPesquisa";
 import { ActionButton } from "../components/BotaoAcao";
 import { LoadingScreen } from "../components/TelaCarregamento";
+import { useAvailableTags } from "../utils/useAvailableTags";
 
 export interface PropostaTopic {
   id_proposta: number;
@@ -29,6 +30,8 @@ export default function InterfaceProf() {
 
   const [topics, setTopics] = useState<PropostaTopic[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const availableTags = useAvailableTags();
 
   const navigate = useNavigate();
 
@@ -55,10 +58,6 @@ export default function InterfaceProf() {
     getEssays();
   }, []);
 
-  const availableTags = useMemo(() => {
-    const todas = topics.flatMap((t) => t.tags ?? []);
-    return [...new Set(todas)].sort();
-  }, [topics]);
 
   const filtered = useMemo(() => {
     return topics

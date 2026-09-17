@@ -11,6 +11,7 @@ import { Footer } from "../components/Footer";
 import { ActionButton } from "../components/BotaoAcao";
 import { SuppTextCreationArea } from "../components/FormCriacaoTxtApoio";
 import { TagsInput } from "../components/TagsInput";
+import { useAvailableTags } from "../utils/useAvailableTags";
 
 export interface SupportTextFormData {
   title: string;
@@ -20,12 +21,20 @@ export interface SupportTextFormData {
   file?: File | null;
 }
 
+
 export default function InterfaceCriarRedacao() {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [componentList, setComponentList] = useState<SupportTextWithId[]>([]);
   const [supportTextIds, setSupportTextIds] = useState<(number | string)[]>([]);
   const [essayTitle, setEssayTitle] = useState<string>("");
   const [tags, setTags] = useState<string[]>(["Educação"]);
+
+  const fetchedTags = useAvailableTags();
+  const defaultTagOptions = ["Educação", "Economia", "Saúde"];
+  const availableTagOptions = React.useMemo(
+    () => [...new Set([...defaultTagOptions, ...fetchedTags])].sort(),
+    [fetchedTags]
+  );
 
   const navigate = useNavigate();
 
@@ -153,7 +162,7 @@ export default function InterfaceCriarRedacao() {
           <TagsInput
             tags={tags}
             onChange={setTags}
-            initialOptions={["Educação", "Economia", "Saúde"]}
+            initialOptions={availableTagOptions}
           />
 
           <ActionButton

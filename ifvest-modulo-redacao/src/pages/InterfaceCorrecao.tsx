@@ -96,11 +96,11 @@ export interface InterfaceCorrecaoProps {
 }
 
 const competenciasDisponiveis: CompetenciaItem[] = [
-  { id: "c1", label: "Competência 1", cor: "#fbf72d" },
-  { id: "c2", label: "Competência 2", cor: "#ffba52" },
-  { id: "c3", label: "Competência 3", cor: "#2196f3" },
-  { id: "c4", label: "Competência 4", cor: "#66ad69" },
-  { id: "c5", label: "Competência 5", cor: "rgb(250, 133, 225)" },
+  { id: "c1", label: "Competência 1", cor: "#fbc02d" },
+  { id: "c2", label: "Competência 2", cor: "#f57c00" },
+  { id: "c3", label: "Competência 3", cor: "#1976d2" },
+  { id: "c4", label: "Competência 4", cor: "#388e3c" },
+  { id: "c5", label: "Competência 5", cor: "#d81b60" },
 ];
 
 const dadosCompetenciasEnem: CompetenciaEnemInfo[] = [

@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, ChangeEvent } from "react";
+import React, { useState, useEffect, KeyboardEvent, ChangeEvent } from "react";
 import "../styles/App.css";
 
 export interface TagsInputProps {
@@ -15,6 +15,10 @@ export function TagsInput({
   const [availableOptions, setAvailableOptions] = useState<string[]>(initialOptions);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
+
+  useEffect(() => {
+    setAvailableOptions((prev) => [...new Set([...prev, ...initialOptions])]);
+  }, [initialOptions]);
 
   const handleAddTag = (option: string) => {
     if (!tags.includes(option)) onChange([...tags, option]);

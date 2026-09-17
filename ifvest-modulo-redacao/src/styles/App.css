@@ -304,6 +304,11 @@
       margin-bottom: 12px;
     }
 
+    .barra-pesquisa:focus-visible {
+      outline: 3px solid var(--borda-barra-pesq);
+      outline-offset: 2px;
+    }
+
     .input-barra-pesquisa {
       border: none;
       outline: none;
@@ -1141,29 +1146,29 @@
     }
 
    /* Competência 1 - Amarelo */
-    .comp-header-c1 { background-color: #fffde7; color: #b78103; border: 1px solid #fbc02d; }
-    .comp-desc-c1 { background-color: #fffdf4; color: #8a6d1c; opacity: 0.65; border: 1px solid #fbc02d; }
-    .comp-input-c1 { border: 2px solid #fbc02d; color: #b78103; }
+    .comp-header-c1 { background-color: #fffde7; color: #6d4c00; border: 1px solid #d4a017; }
+    .comp-desc-c1 { background-color: #fffdf4; color: #5d4000; border: 1px solid #d4a017; }
+    .comp-input-c1 { border: 2px solid #d4a017; color: #6d4c00; }
 
     /* Competência 2 - Laranja */
-    .comp-header-c2 { background-color: #fff3e0; color: #e65100; border: 1px solid #ff9800; }
-    .comp-desc-c2 { background-color: #fff8e1; color: #ef6c00; opacity: 0.65; border: 1px solid #ff9800; }
-    .comp-input-c2 { border: 2px solid #ff9800; color: #e65100; }
+    .comp-header-c2 { background-color: #fff3e0; color: #b73c00; border: 1px solid #f57c00; }
+    .comp-desc-c2 { background-color: #fff8e1; color: #9a3100; border: 1px solid #f57c00; }
+    .comp-input-c2 { border: 2px solid #f57c00; color: #b73c00; }
 
     /* Competência 3 - Azul */
-    .comp-header-c3 { background-color: #e3f2fd; color: #1565c0; border: 1px solid #2196f3; }
-    .comp-desc-c3 { background-color: #f4faff; color: #0d47a1; opacity: 0.65; border: 1px solid #2196f3; }
-    .comp-input-c3 { border: 2px solid #2196f3; color: #1565c0; }
+    .comp-header-c3 { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #1976d2; }
+    .comp-desc-c3 { background-color: #f4faff; color: #0a3880; border: 1px solid #1976d2; }
+    .comp-input-c3 { border: 2px solid #1976d2; color: #0d47a1; }
 
     /* Competência 4 - Verde */
-    .comp-header-c4 { background-color: #e8f5e9; color: #1b5e20; border: 1px solid #4caf50; }
-    .comp-desc-c4 { background-color: #f1f8e9; color: #2e7d32; opacity: 0.65; border: 1px solid #4caf50; }
-    .comp-input-c4 { border: 2px solid #4caf50; color: #1b5e20; }
+    .comp-header-c4 { background-color: #e8f5e9; color: #1b5e20; border: 1px solid #388e3c; }
+    .comp-desc-c4 { background-color: #f1f8e9; color: #144718; border: 1px solid #388e3c; }
+    .comp-input-c4 { border: 2px solid #388e3c; color: #1b5e20; }
 
     /* Competência 5 - Rosa */
-    .comp-header-c5 { background-color: #fce4ec; color: #c2185b; border: 1px solid #e91e63; }
-    .comp-desc-c5 { background-color: #fff4f7; color: #880e4f; opacity: 0.65; border: 1px solid #e91e63; }
-    .comp-input-c5 { border: 2px solid #e91e63; color: #c2185b; }
+    .comp-header-c5 { background-color: #fce4ec; color: #880e4f; border: 1px solid #d81b60; }
+    .comp-desc-c5 { background-color: #fff4f7; color: #6a0b3e; border: 1px solid #d81b60; }
+    .comp-input-c5 { border: 2px solid #d81b60; color: #880e4f; }
 
 /* AREA CORRETOR/ALUNO */
 
