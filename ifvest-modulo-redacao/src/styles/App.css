@@ -18,7 +18,7 @@
   /* Toolbar página principal */
   --cor-label-temas: #757575;
   --btn-area-aluno: #c8e44d;
-  --texto-btn-aluno: #ffffff;
+  --texto-btn-aluno: #333333;
   --btn-area-prof: #2d6a4f;
   --texto-btn-prof: #ffffff;
   
@@ -27,12 +27,12 @@
   --fundo-barra-pesq: #f0f0f0;
   
   /* Card não feito */
-  --fundo-nao-feito: #e8f3e8;   
-  --btn-nao-feito: #ceddce;   
+  --fundo-nao-feito: #d6e8d6;   
+  --btn-nao-feito: #8fac8f;   
   
   /* Card feito */
-  --fundo-feito: #e8f3ba;   
-  --btn-feito: #c8e44d;   
+  --fundo-feito: #dfeeab;   
+  --btn-feito: #9dbf3a;   
   
   /* Textos de apoio */
   --texto-txt-apoio: #000000;
@@ -412,6 +412,11 @@
 
     .card-redacao:hover {
       opacity: 0.8;
+    }
+
+    .card-redacao:focus-visible {
+      outline: 3px solid #2d6a4f;
+      outline-offset: 2px;
     }
 
     .titulo-card-redacao {
@@ -1182,6 +1187,11 @@
       opacity: 0.8;
     }
 
+    .card-correcao:focus-visible {
+      outline: 3px solid #2d6a4f;
+      outline-offset: 2px;
+    }
+
     .card-correcao-info {
       display: flex;
       flex-direction: column;
@@ -1296,6 +1306,11 @@
 
     .card-proposta:hover {
       opacity: 0.8;
+    }
+
+    .card-proposta:focus-visible {
+      outline: 3px solid #2d6a4f;
+      outline-offset: 2px;
     }
 
     .card-proposta-info {

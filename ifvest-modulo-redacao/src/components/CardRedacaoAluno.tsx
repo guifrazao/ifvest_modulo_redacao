@@ -1,6 +1,6 @@
 import React, { useEffect, useState, KeyboardEvent, MouseEvent, CSSProperties } from "react";
 import api from "../api";
-import T from "../styles/tokens";
+import "../styles/App.css";
 import "../styles/App.css";
 
 export interface CorrectionTopicCardProps {
@@ -39,8 +39,8 @@ export function CorrectionTopicCard({
   correctorName: initialCorrectorName 
 }: CorrectionTopicCardProps) {
   const isDone = status === "done";
-  const cardBg  = isDone ? T.fundoFeito  : T.fundoNaoFeito;
-  const arrowBg = isDone ? T.btnFeito : T.btnNaoFeito;
+  const cardBg  = isDone ? "var(--fundo-feito)"  : "var(--fundo-nao-feito)";
+  const arrowBg = isDone ? "var(--btn-feito)" : "var(--btn-nao-feito)";
 
   const [correctionDate, setCorrectionDate] = useState<string | undefined>(initialCorrectionDate);
   const [score, setScore] = useState<number | undefined>(initialScore);

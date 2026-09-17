@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import T from "../styles/tokens";
+import "../styles/App.css"
 import api from "../api";
 import { idCorretor } from "../globals";
 import { Header } from "../components/Header";
@@ -80,7 +80,7 @@ export default function InterfaceProf() {
         flexDirection: "column",
         minHeight: "100vh",
         margin: "0 auto",
-        background: T.fundoPagina,
+        background: "var(--fundo-pagina)",
         boxShadow: "0 0 18px rgba(0,0,0,.12)",
       }}
     >
@@ -95,7 +95,7 @@ export default function InterfaceProf() {
           maxWidth: 1500,
           padding: "12px 10px 16px",
           alignSelf: "center",
-          background: T.fundoPagina,
+          background: "var(--fundo-pagina)",
         }}
       >
         <div
@@ -109,32 +109,32 @@ export default function InterfaceProf() {
           <span
             style={{
               fontSize: 14,
-              color: T.corLabelTemas,
+              color: "var(--cor-label-temas)",
               fontFamily: "'Roboto', sans-serif",
             }}
           >
-            Temas de redação
+            Propostas de redação
           </span>
 
           <div style={{ display: "flex", gap: "4px" }}>
             <ActionButton
               text="Minhas Propostas"
-              textColor={T.textoBtnProf}
-              color={T.btnAreaProf}
+              textColor={"var(--texto-btn-prof)"}
+              color={"var(--btn-area-prof)"}
               borderRadius={20}
               onClick={() => navigate("/minhas_propostas")}
             />
             <ActionButton
-              text="Minhas redações"
-              textColor={T.textoBtnAluno}
-              color={T.btnAreaAluno}
+              text="Minhas correções"
+              textColor={"var(--texto-btn-aluno)"}
+              color={"var(--btn-area-aluno)"}
               borderRadius={20}
               onClick={() => navigate("/area_corretor")}
             />
             <ActionButton
               text="Criar nova proposta"
-              textColor={T.textoBtnProf}
-              color={T.btnAreaProf}
+              textColor={"var(--texto-btn-prof)"}
+              color={"var(--btn-area-prof)"}
               borderRadius={20}
               onClick={() => navigate("/criar_redacao")}
             />
@@ -142,7 +142,7 @@ export default function InterfaceProf() {
         </div>
 
         <TopicSearchBar
-          placeholder="Pesquisar temas de redação..."
+          placeholder="Pesquisar propostas de redação..."
           query={query}
           onChange={(e) => setQuery(e.target.value)}
           availableTags={availableTags}
