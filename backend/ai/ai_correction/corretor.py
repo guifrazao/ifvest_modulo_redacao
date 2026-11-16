@@ -11,6 +11,7 @@ import anthropic
 
 from core import settings
 from schemas import CorrecaoIA
+from . import ancoragem
 from .plagio import ResultadoPlagio
 
 PROMPT_SISTEMA = """Você é um corretor especializado em redações do ENEM. \
@@ -55,6 +56,22 @@ class ErroDeCorrecao(Exception):
         self.status = status
 
 
+def _prompt_sistema() -> str:
+    """Prompt de sistema, com as redações de referência quando configuradas.
+
+    Montado a cada chamada em vez de uma vez na importação: assim trocar o
+    arquivo de âncoras passa a valer sem reiniciar o servidor, e um arquivo
+    inválido falha na requisição, com mensagem clara, em vez de derrubar a
+    aplicação inteira na subida.
+    """
+    try:
+        return ancoragem.aplicar(PROMPT_SISTEMA, settings.ancoras_path)
+    except ancoragem.ErroDeAncoragem as erro:
+        raise ErroDeCorrecao(
+            f"Configuração de ancoragem inválida: {erro}", status=500
+        ) from erro
+
+
 def montar_prompt(
     redacao: str,
     titulo_tema: str | None,
@@ -95,7 +112,15 @@ def corrigir_redacao(
         resposta = cliente.messages.parse(
             model=settings.MODEL,
             max_tokens=settings.MAX_TOKENS,
-            system=PROMPT_SISTEMA,
+            # O bloco de sistema é idêntico em toda correção; marcá-lo como
+            # cacheável faz a segunda chamada em diante pagar leitura de cache
+            # em vez do prompt inteiro. Importa sobretudo com ancoragem, que
+            # acrescenta alguns milhares de tokens fixos.
+            system=[{
+                "type": "text",
+                "text": _prompt_sistema(),
+                "cache_control": {"type": "ephemeral"},
+            }],
             messages=[
                 {
                     "role": "user",

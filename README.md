@@ -124,6 +124,7 @@ npm start
 | `MODEL` | `claude-opus-5` | Modelo utilizado da IA de correção |
 | `MAX_TOKENS` | `8000` | Quantidade máxima de tokens da IA de correção |
 | `EFFORT` | `medium` | Esforço feito pela IA de correção |
+| `ANCORAS` | - | Caminho de um arquivo JSON com redações já corrigidas por avaliador humano, usadas para calibrar a correção por IA. Vazio ou ausente desliga a calibração e a correção fica como antes. Formato, critérios de escolha e o resultado medido estão documentados em `backend/ai/ai_correction/ancoragem.py` |
 
 ---
 

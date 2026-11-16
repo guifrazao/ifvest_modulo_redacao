@@ -4,6 +4,10 @@
 # Google credentials
 credencial.json
 
+# Redações de referência da ancoragem: são redações de aluno com a nota que a
+# corretora atribuiu, então não entram no repositório.
+ancoras.json
+
 # Python cache
 __pycache__/
 *.pyc
